@@ -1,0 +1,9 @@
+Prioriteringslista:
+v.	Delning på hemsida
+vi.	Möjlighet att se access på de som är inloggade
+
+Avklarat!
+i.	”Byta kort” 
+ii.	Automatisk utloggning en gång per dygn
+iii.	Nätverksuppkoppling - sladd finns (sitter i)
+iv.	Delning av loggfil
