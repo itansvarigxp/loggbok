@@ -117,8 +117,11 @@ def save():
 # samt tömmer loggboken vid ett visst klockslag
 def bg_main():
     while True:
-        time_now = datetime.datetime.now().strftime("%H:%M:%S")  # kolla klockan  
+        time_now = datetime.datetime.now().strftime("%H:%M:%S")  # kolla klockan
+
         if time_now >= ('04:00:00') and time_now <= ('05:00:10'):  # Mellan 4 & 5
+            import_new_members()
+            save_memberlist_to_file()
             clear()
             init_member_register()
         #save()
@@ -130,7 +133,28 @@ def bg_main():
 #t_bgmain = Thread(target=bg_main)
 #t_bgmain.start()
 
+def import_new_members():
+    #file_semaphore.acquire()
+    # Använd bara denna på natten eller något.
+    medreg = openpyxl.load_workbook('Nyamedlemmar.xlsx')
+    medSheet = medreg.get_sheet_by_name('Medlemsregister')
+    for row in range(2, medSheet.max_row + 1):
+        keyCard = medSheet['A' + str(row)].value
+        name =  medSheet['B' + str(row)].value
+        member_register[keyCard] = (name, medSheet['C' + str(row)].value == 'Styret')
+    medreg._archive.close()
+
+    medreg = openpyxl.Workbook()
+    medSheet = medreg.active()
+    medSheet.title = 'Medlemsregister'
+    medSheet['A1'] = '0,Nyckelnr'
+    medSheet['B1'] = 'Namn'
+    medSheet['C1'] = 'Styrelsemedlem'
+    medreg.save('Nyamedlemmar.xlsx')
+    medreg._archive.close()    
+
 def save_memberlist_to_file():
+    file_semaphore.acquire()
     medreg = openpyxl.Workbook()
     medSheet = medreg.active()
     medSheet.title = 'Medlemsregister'
@@ -144,8 +168,9 @@ def save_memberlist_to_file():
         medSheet['B' + str(row)] = member[0]
         if member[1]:
             medSheet['C' + str(row)] = 'Styret'
-    wb.save('Medlemsregister.xlsx')
+    medreg.save('Medlemsregister.xlsx')
     medreg._archive.close()
+    file_semaphore.release()
 
 def clear():
     checked_in_members = {}
@@ -156,6 +181,10 @@ def members_to_str(checked_in):
     for keys in checked_in:
         tmp = tmp + checked_in[keys][0] + '\n'
     return tmp
+
+def second_counter(datetime_wait_until):
+    return str(int((datetime_wait_until - datetime.datetime.now()).seconds) + 1)
+
 
 def exit_program():
     sys.exit()
@@ -279,8 +308,8 @@ while True:
             sleep(2)
             # då ska vi checka in
         else:
-            text.delete('1.0', tk.END)
             time_to_wait = 5
+            text.delete('1.0', tk.END)
             text.insert("1.0", 'Card not recognised!\nPlease scan again to start a transfer process\nor wait %s seconds to cancel\n' %str(time_to_wait), 'default')
             root.update()
             old_card_number = card_number
@@ -288,6 +317,8 @@ while True:
             date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
 
             while (line_count(text.get('1.0',tk.END)) < 5) and (date_time_to_wait > datetime.datetime.now()):
+                text.delete('1.0', tk.END)
+                text.insert("1.0", 'Card not recognised!\nPlease scan again to start a transfer process\nor wait %s seconds to cancel\n' %second_counter(date_time_to_wait), 'default')
                 root.update()
             
             if not (line_count(text.get('1.0',tk.END)) < 5):
@@ -297,6 +328,8 @@ while True:
                     text.insert("1.0", 'Now scan your old card that you want to transfer\nyour data from, or wait %s seconds to cancel\n' %str(time_to_wait), 'default')
                     date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
                     while (line_count(text.get('1.0',tk.END)) < 4) and (date_time_to_wait > datetime.datetime.now()):
+                        text.delete('1.0', tk.END)
+                        text.insert("1.0", 'Now scan your old card that you want to transfer\nyour data from, or wait %s seconds to cancel\n' %second_counter(date_time_to_wait), 'default')
                         root.update()
                     if not (line_count(text.get('1.0',tk.END)) < 4):
                         file_semaphore.acquire()
@@ -306,15 +339,18 @@ while True:
                         file_semaphore.release()
                     else:
                         text.delete('1.0', tk.END)
-                        text.insert("1.0", "Aborted!")
+                        text.insert("1.0", "Aborted!", 'default')
+                        root.update()
                         sleep(2)
                 else:
                     text.delete('1.0', tk.END)
-                    text.insert("1.0", "Aborted!")
+                    text.insert("1.0", "Aborted!", 'default')
+                    root.update()
                     sleep(2)
 
             else:
                 text.delete('1.0', tk.END)
-                text.insert("1.0", "Aborted!")
+                text.insert("1.0", "Aborted!", 'default')
+                root.update()
                 sleep(2)
 

@@ -15,6 +15,11 @@ from os import remove
 # Variabler som används
 card_number = ''
 exit_flag = False
+checked_in_members = {}
+checked_in_styret = {}
+member_register = {}
+
+board_members_checkedin = 0
 
 
 checking = ''
@@ -29,8 +34,7 @@ reset = False
 Styret = False
 Styret_antal = 0
 
-root = Tk()
-root.title("Incheckade XP")
+
 alpha = False
 regkort = 0
 
@@ -38,21 +42,23 @@ regkort = 0
 # samt tömmer loggboken vid ett visst klockslag
 def bg_main():
     while True:
-        today = datetime.datetime.now()
-        time_now = today.time().strftime("%H:%M:%S")  # kolla klockan  
-        if time_now >= ('04:00:00') and time_now <= ('05:00:00'):  # Mellan 4 & 5
-            clear():
+        time_now = datetime.datetime.now().strftime("%H:%M:%S")  # kolla klockan  
+        if time_now >= ('04:00:00') and time_now <= ('05:00:10'):  # Mellan 4 & 5
+            clear()
+            init_member_register()
         save()
-        time.sleep(3599)
+        time.sleep(3600)
 
 t_bgmain = Thread(target=bg_main)
 t_bgmain.start()
 
 def clear():
-    incheckade = []
+    checked_in = {}
     Styret_antal = 0
-    reset = True
 
+def save_and_clear():
+    save()
+    clear()
 # Time-out funktion för byte av kort
 
 def abort():
@@ -63,12 +69,20 @@ def abort():
 def save():
         loggbok.save('info/Loggbok_extern.xlsx')
 
-def init_medlemsregister():
+
+def init_member_register():
     medreg = openpyxl.load_workbook('Medlemsregister.xlsx')
     medSheet = medreg.get_sheet_by_name('Sheet1')
+    member_register = {}
+    for row in range(2, medSheet.max_row + 1):
+        keyCard = medSheet['A' + str(row)].value
+        name =  medSheet['B' + str(row)].value
+        member_register[key] = (name, medSheet['C' + str(row)].value == 'Styret')
+    medreg._archive.close()
+
+def init_log():
     loggbok = openpyxl.load_workbook('Loggbok.xlsx')
     loggSheet = loggbok.active
-
 
 def exit():
     exit_flag = True
@@ -76,12 +90,17 @@ def exit():
 commands = {
     'exit' : exit,
     'clear' : clear,
-    'update' : update
+    'save' : save,
+    'saveclear' : save_and_clear
+    'update' : init_member_register
 }
+
+             
+
 
 # Starta huvudloopen
 def main():
-    init_medlemsregister()
+    init_member_register()
 
     while !exit_flag:
         # Wait for input from NFC reader
@@ -93,16 +112,32 @@ def main():
             card_number = "0," + card_number
 
         # Number was read
-        today = datetime.datetime.now()
-        date = today.date()
-        year = date.year
-        month = today.month
-        day = today.day
-        time_now = today.time().strftime("%H:%M:%S")
+        date_time_now = datetime.datetime.now()
+        time_now_str = date_time_now.strftime("%H:%M:%S")
+        date_now_str = date_time_now.strftime("%Y-%m-%d")
+
+        text.insert(END, '\n')    
+
+        if card_number in checked_in:
+
+            namn = checked_in[card_number]
+            text.insert(END, "Goodbye %s\n\n" %namn, 'message')
+            del checked_in[card_number]
+
+        elif card_number in member_register
+
+            namn = member_register[card_number]
+            checked_in[card_number] = member_register[card_number]
+            text.insert(END, "Welcome %s\n\n" %namn, 'message')
+
+        else:
+                # do something else on screen
+            pass
 
 
-
-
+        text.insert(END, 'Incheckade:\n', 'rubrik')
+        text.insert(END, item, 'list')
+        text.pack(side=RIGHT)
 
 while checking != '0,exit':
 
