@@ -68,27 +68,27 @@ styret_namelist = ""
 member_namelist = ""
 
 text_area_height = 100
+input_area_height = 30
 text_area_width = main_window_width
+input_area_width = main_window_width
 
 message_area_bg_color = 'black'
 message_area_fg_color = 'white'
+
+input_area_bg_color = 'black'
+input_area_fg_color = 'white'
+
 message_area = tk.Canvas(bg=message_area_bg_color)
-message_area.configure(width=700, height=100)
+message_area.configure(width=700, height=text_area_height)
 message_area.pack(side=tk.BOTTOM, expand=False)
-
-
-text_area_height = 100
-text_area_width = main_window_width
-
 default_message = "Please swipe your card\n"
 
 
-text = tk.Text(message_area, height=text_area_height, width=text_area_width, 
-                bg=message_area_bg_color, foreground=message_area_fg_color)
-text.tag_configure('message', font=('Arial', 20, 'bold'))
-text.tag_configure('default', font=('Arial', 20, 'bold'))
-
-text.insert("1.0", default_message, 'default')
+text = tk.Text(message_area, height=input_area_height, width=input_area_width, 
+                bg=input_area_bg_color, foreground=input_area_fg_color)
+#text.tag_configure('message', font=('Arial', 20, 'bold'))
+#text.tag_configure('default', font=('Arial', 20, 'bold'))
+#text.insert("1.0", default_message, 'default')
 text.pack(side=tk.BOTTOM, expand=False)
 text.focus()
 
@@ -121,7 +121,6 @@ def bg_main():
 
         if time_now >= ('04:00:00') and time_now <= ('05:00:10'):  # Mellan 4 & 5
             import_new_members()
-            save_memberlist_to_file()
             clear()
             init_member_register()
         #save()
@@ -134,7 +133,7 @@ def bg_main():
 #t_bgmain.start()
 
 def import_new_members():
-    #file_semaphore.acquire()
+    file_semaphore.acquire()
     # Använd bara denna på natten eller något.
     medreg = openpyxl.load_workbook('Nyamedlemmar.xlsx')
     medSheet = medreg.get_sheet_by_name('Medlemsregister')
@@ -151,10 +150,11 @@ def import_new_members():
     medSheet['B1'] = 'Namn'
     medSheet['C1'] = 'Styrelsemedlem'
     medreg.save('Nyamedlemmar.xlsx')
-    medreg._archive.close()    
+    medreg._archive.close()
+    save_memberlist_to_file()
+    file_semaphore.release()    
 
 def save_memberlist_to_file():
-    file_semaphore.acquire()
     medreg = openpyxl.Workbook()
     medSheet = medreg.active()
     medSheet.title = 'Medlemsregister'
@@ -170,16 +170,18 @@ def save_memberlist_to_file():
             medSheet['C' + str(row)] = 'Styret'
     medreg.save('Medlemsregister.xlsx')
     medreg._archive.close()
-    file_semaphore.release()
 
 def clear():
     checked_in_members = {}
     checked_in_styret = {}
 
-def members_to_str(checked_in):
-    tmp = ''
+def members_to_str(checked_in, split_at):
+    tmp = []
+    name_count = 0
     for keys in checked_in:
-        tmp = tmp + checked_in[keys][0] + '\n'
+        idx = name_count // split_at
+        tmp[idx] = tmp[idx] + checked_in[keys][0] + '\n'
+        name_count = name_count + 1
     return tmp
 
 def second_counter(datetime_wait_until):
@@ -191,12 +193,20 @@ def exit_program():
 
 
 def update_lists():
-    checked_in_members_str = members_to_str(checked_in_members)
-    checked_in_styret_str = members_to_str(checked_in_styret)
-    cv.create_text(styret_namelist_offsetX, styret_namelist_offsetY, fill=namelist_color,
-                    font=namelist_font, anchor='nw', text=checked_in_styret_str)
-    cv.create_text(member_namelist_offsetX, member_namelist_offsetY, fill=namelist_color,
-                    font=namelist_font, anchor='nw', text=checked_in_members_str)
+    next_col = 300
+    checked_in_members_str = members_to_str(checked_in_members, 16)
+    checked_in_styret_str = members_to_str(checked_in_styret, 10)
+    idx = 0
+    for items in checked_in_styret_str:
+        cv.create_text(styret_namelist_offsetX + next_col*idx, styret_namelist_offsetY, 
+                        fill=namelist_color, font=namelist_font, anchor='nw', text=items)
+        idx = idx + 1
+    
+    idx = 0
+    for items in checked_in_members_str:
+        cv.create_text(member_namelist_offsetX + next_col*idx, member_namelist_offsetY,
+                        fill=namelist_color, font=namelist_font, anchor='nw', text=items)
+        idx = idx + 1
 
 
 # Fixa semafor till denna funktion
@@ -271,8 +281,9 @@ def checkin_member(key, member):
 #mv_incheckade_png()
 
 while True:
-    text.delete('1.0', tk.END)
-    text.insert("1.0", default_message, 'default')
+    update_lists()
+    #text.delete('1.0', tk.END)
+    #text.insert("1.0", default_message, 'default')
     while line_count(text.get('1.0',tk.END)) < 3:
         root.update()
      
@@ -289,47 +300,47 @@ while True:
         date_now_str = date_time_now.strftime("%Y-%m-%d")
 
         if card_number in checked_in_members:
-            text.delete('1.0', tk.END)
-            text.insert("1.0", 'Goodbye %s' %checked_in_members[card_number] , 'default')
+            #text.delete('1.0', tk.END)
+            #text.insert("1.0", 'Goodbye %s' %checked_in_members[card_number] , 'default')
             save_to_logg(checked_in_members[card_number])
             sleep(2)
             # spara i loggboken
         elif card_number in checked_in_styret:   
-            text.delete('1.0', tk.END)
-            text.insert("1.0", 'Goodbye %s' %checked_in_styret[card_number] , 'default')
+            #text.delete('1.0', tk.END)
+            #text.insert("1.0", 'Goodbye %s' %checked_in_styret[card_number] , 'default')
             save_to_logg(checked_in_members[card_number])
             sleep(2)
 
             # spara i loggboken
         elif card_number in member_register:
-            text.delete('1.0', tk.END)
-            text.insert("1.0", 'Welcome ', 'default')
+            #text.delete('1.0', tk.END)
+            #text.insert("1.0", 'Welcome ', 'default')
             checkin_member(card_number, member_register[card_number])
             sleep(2)
             # då ska vi checka in
         else:
             time_to_wait = 5
-            text.delete('1.0', tk.END)
-            text.insert("1.0", 'Card not recognised!\nPlease scan again to start a transfer process\nor wait %s seconds to cancel\n' %str(time_to_wait), 'default')
+            #text.delete('1.0', tk.END)
+            #text.insert("1.0", 'Card not recognised!\nPlease scan again to start a transfer process\nor wait %s seconds to cancel\n' %str(time_to_wait), 'default')
             root.update()
             old_card_number = card_number
             time_flag = True
             date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
 
             while (line_count(text.get('1.0',tk.END)) < 5) and (date_time_to_wait > datetime.datetime.now()):
-                text.delete('1.0', tk.END)
-                text.insert("1.0", 'Card not recognised!\nPlease scan again to start a transfer process\nor wait %s seconds to cancel\n' %second_counter(date_time_to_wait), 'default')
+                #text.delete('1.0', tk.END)
+                #text.insert("1.0", 'Card not recognised!\nPlease scan again to start a transfer process\nor wait %s seconds to cancel\n' %second_counter(date_time_to_wait), 'default')
                 root.update()
             
             if not (line_count(text.get('1.0',tk.END)) < 5):
                 new_card_number = '0,' + text.get('4.0',tk.END)
                 if new_card_number == old_card_number:
-                    text.delete('1.0', tk.END)
-                    text.insert("1.0", 'Now scan your old card that you want to transfer\nyour data from, or wait %s seconds to cancel\n' %str(time_to_wait), 'default')
+                    #text.delete('1.0', tk.END)
+                    #text.insert("1.0", 'Now scan your old card that you want to transfer\nyour data from, or wait %s seconds to cancel\n' %str(time_to_wait), 'default')
                     date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
                     while (line_count(text.get('1.0',tk.END)) < 4) and (date_time_to_wait > datetime.datetime.now()):
-                        text.delete('1.0', tk.END)
-                        text.insert("1.0", 'Now scan your old card that you want to transfer\nyour data from, or wait %s seconds to cancel\n' %second_counter(date_time_to_wait), 'default')
+                        #text.delete('1.0', tk.END)
+                        #text.insert("1.0", 'Now scan your old card that you want to transfer\nyour data from, or wait %s seconds to cancel\n' %second_counter(date_time_to_wait), 'default')
                         root.update()
                     if not (line_count(text.get('1.0',tk.END)) < 4):
                         file_semaphore.acquire()
@@ -338,19 +349,19 @@ while True:
                         save_memberlist_to_file()
                         file_semaphore.release()
                     else:
-                        text.delete('1.0', tk.END)
-                        text.insert("1.0", "Aborted!", 'default')
+                        #text.delete('1.0', tk.END)
+                        #text.insert("1.0", "Aborted!", 'default')
                         root.update()
-                        sleep(2)
+                        sleep(1)
                 else:
-                    text.delete('1.0', tk.END)
-                    text.insert("1.0", "Aborted!", 'default')
+                    #text.delete('1.0', tk.END)
+                    #text.insert("1.0", "Aborted!", 'default')
                     root.update()
-                    sleep(2)
+                    sleep(1)
 
             else:
-                text.delete('1.0', tk.END)
-                text.insert("1.0", "Aborted!", 'default')
+                #text.delete('1.0', tk.END)
+                #text.insert("1.0", "Aborted!", 'default')
                 root.update()
-                sleep(2)
+                sleep(1)
 
