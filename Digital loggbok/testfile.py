@@ -98,11 +98,10 @@ message.pack(side=tk.TOP, expand=False)
 
 text = tk.Text(interactive_area, height=input_area_height, width=input_area_width, 
                 bg=input_area_bg_color, foreground=input_area_fg_color, bd = 0)
-#text.tag_configure('message', font=('Arial', 20, 'bold'))
-#text.tag_configure('default', font=('Arial', 20, 'bold'))
-#text.insert("1.0", default_message, 'default')
+
 text.pack(side=tk.BOTTOM, expand=False)
 text.focus()
+
 # Här börjar kod
 command = ''
 card_number = ''
@@ -291,9 +290,8 @@ def checkin_member(key, member):
 #mv_incheckade_png()
 
 while True:
+
     update_lists()
-    #text.delete('1.0', tk.END)
-    #text.insert("1.0", default_message, 'default')
     message_variable.set("Please swipe your card")
     while line_count(text.get('1.0',tk.END)) < 2:
         root.update()
@@ -314,30 +312,22 @@ while True:
 
         if card_number in checked_in_members:
             message_variable.set('Goodbye %s' %checked_in_members[card_number])
-            #text.delete('1.0', tk.END)
-            #text.insert("1.0", 'Goodbye %s' %checked_in_members[card_number] , 'default')
             save_to_logg(checked_in_members[card_number])
             sleep(2)
             # spara i loggboken
         elif card_number in checked_in_styret:   
             message_variable.set('Goodbye %s' %checked_in_styret[card_number])
-            #text.delete('1.0', tk.END)
-            #text.insert("1.0", 'Goodbye %s' %checked_in_styret[card_number] , 'default')
             save_to_logg(checked_in_members[card_number])
             sleep(2)
 
             # spara i loggboken
         elif card_number in member_register:
             message_variable.set('Welcome %s' %member_register[card_number])
-            #text.delete('1.0', tk.END)
-            #text.insert("1.0", 'Welcome ', 'default')
             checkin_member(card_number, member_register[card_number])
             sleep(2)
             # då ska vi checka in
         else:
             time_to_wait = 5
-            #text.delete('1.0', tk.END)
-            #text.insert("1.0", 'Card not recognised!\nPlease scan again to start a transfer process\nor wait %s seconds to cancel\n' %str(time_to_wait), 'default')
             old_card_number = card_number
             time_flag = True
             date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
