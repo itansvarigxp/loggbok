@@ -101,7 +101,6 @@ text = tk.Text(interactive_area, height=input_area_height, width=input_area_widt
 
 text.pack(side=tk.BOTTOM, expand=False)
 text.focus()
-
 # Här börjar kod
 command = ''
 card_number = ''
@@ -293,15 +292,16 @@ while True:
 
     update_lists()
     message_variable.set("Please swipe your card")
-    while line_count(text.get('1.0',tk.END)) < 2:
+    while line_count(text.get('1.0',tk.END+"-1c")) < 1:
         root.update()
      
 
-    card_number = text.get('1.0',tk.END)
+    card_number = text.get('1.0',tk.END+"-1c")[:-1]
     text.delete('1.0', tk.END)
-
-    if card_number[:-1] in commands:
-        pass
+    
+    if card_number in commands:
+        func = commands[card_number]
+        func()
     else:
         card_number = '0,' + card_number
 
@@ -329,23 +329,25 @@ while True:
         else:
             time_to_wait = 5
             old_card_number = card_number
+            print(old_card_number)
             time_flag = True
             date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
 
-            while (line_count(text.get('1.0',tk.END)) < 2) and (date_time_to_wait > datetime.datetime.now()):
+            while (line_count(text.get('1.0',tk.END+"-1c")) < 1) and (date_time_to_wait > datetime.datetime.now()):
                 message_variable.set('Card not recognised!\nPlease scan again to start a transfer process,\nor wait %s seconds to cancel' %second_counter(date_time_to_wait))
                 root.update()
             
-            if not (line_count(text.get('1.0',tk.END)) < 2):
-                new_card_number = '0,' + text.get('1.0',tk.END)
+            if not (line_count(text.get('1.0',tk.END+"-1c")) < 1):
+                new_card_number = '0,' + text.get('1.0',tk.END+"-1c")[:-1]
+                print(new_card_number)
                 if new_card_number == old_card_number:
                     message_variable.set('Now scan your old card that you want to transfer your data from,\nor wait %s seconds to cancel' %str(time_to_wait))
                     date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
                     
-                    while (line_count(text.get('1.0',tk.END)) < 2) and (date_time_to_wait > datetime.datetime.now()):
+                    while (line_count(text.get('1.0',tk.END+"-1c")) < 1) and (date_time_to_wait > datetime.datetime.now()):
                         message_variable.set('Now scan your old card that you want to transfer your data from,\nor wait %s seconds to cancel' %str(time_to_wait))
                         root.update()
-                    if not (line_count(text.get('1.0',tk.END)) < 2):
+                    if not (line_count(text.get('1.0',tk.END+"-1c")) < 1):
                         file_semaphore.acquire()
                         member_register[new_card_number] = member_register[old_card_number]
                         del member_register[old_card_number]
