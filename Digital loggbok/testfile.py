@@ -67,10 +67,14 @@ member_namelist_offsetY = member_title_offsetY + namelist_row_padding + title_si
 styret_namelist = ""
 member_namelist = ""
 
-text_area_height = 100
-input_area_height = 30
-text_area_width = main_window_width
-input_area_width = main_window_width
+interactive_area_width = main_window_width
+interactive_area_height = 80
+message_area_height = 65
+input_area_height = 15
+message_height = message_area_height - input_area_height
+message_area_width = main_window_width
+message_width = message_area_width
+input_area_width = message_area_width
 
 message_area_bg_color = 'black'
 message_area_fg_color = 'white'
@@ -78,24 +82,30 @@ message_area_fg_color = 'white'
 input_area_bg_color = 'black'
 input_area_fg_color = 'white'
 
-message_area = tk.Canvas(bg=message_area_bg_color)
-message_area.configure(width=700, height=text_area_height)
-message_area.pack(side=tk.BOTTOM, expand=False)
-default_message = "Please swipe your card\n"
+interactive_area = tk.Frame(root, bg=message_area_bg_color, width = interactive_area_width, height = interactive_area_height)
+#message_area.configure(width=700, height=text_area_height)
+interactive_area.pack(side=tk.BOTTOM, expand=False)
 
+message_area = tk.Frame(interactive_area, bg=message_area_bg_color, width = message_area_width, height = message_area_height, bd = 0)
+message_area.pack(side=tk.TOP, expand = False)
+message_area.pack_propagate(False)
 
-text = tk.Text(message_area, height=input_area_height, width=input_area_width, 
-                bg=input_area_bg_color, foreground=input_area_fg_color)
+message_variable = tk.StringVar()
+message_variable.set("Please swipe your card")
+message = tk.Message(message_area, bg=message_area_bg_color, width = 500, fg = message_area_fg_color, textvariable = message_variable)
+message.configure(font=('Arial', 18, 'bold'))
+message.pack(side=tk.TOP, expand=False)
+
+text = tk.Text(interactive_area, height=input_area_height, width=input_area_width, 
+                bg=input_area_bg_color, foreground=input_area_fg_color, bd = 0)
 #text.tag_configure('message', font=('Arial', 20, 'bold'))
 #text.tag_configure('default', font=('Arial', 20, 'bold'))
 #text.insert("1.0", default_message, 'default')
 text.pack(side=tk.BOTTOM, expand=False)
 text.focus()
-
 # Här börjar kod
 command = ''
 card_number = ''
-exit_flag = False
 checked_in_members = {}
 checked_in_members_str = ''
 checked_in_styret = {}
@@ -284,12 +294,15 @@ while True:
     update_lists()
     #text.delete('1.0', tk.END)
     #text.insert("1.0", default_message, 'default')
-    while line_count(text.get('1.0',tk.END)) < 3:
+    message_variable.set("Please swipe your card")
+    while line_count(text.get('1.0',tk.END)) < 2:
         root.update()
      
 
-    card_number = text.get('2.0',tk.END)
-    if card_number in commands:
+    card_number = text.get('1.0',tk.END)
+    text.delete('1.0', tk.END)
+
+    if card_number[:-1] in commands:
         pass
     else:
         card_number = '0,' + card_number
@@ -300,12 +313,14 @@ while True:
         date_now_str = date_time_now.strftime("%Y-%m-%d")
 
         if card_number in checked_in_members:
+            message_variable.set('Goodbye %s' %checked_in_members[card_number])
             #text.delete('1.0', tk.END)
             #text.insert("1.0", 'Goodbye %s' %checked_in_members[card_number] , 'default')
             save_to_logg(checked_in_members[card_number])
             sleep(2)
             # spara i loggboken
         elif card_number in checked_in_styret:   
+            message_variable.set('Goodbye %s' %checked_in_styret[card_number])
             #text.delete('1.0', tk.END)
             #text.insert("1.0", 'Goodbye %s' %checked_in_styret[card_number] , 'default')
             save_to_logg(checked_in_members[card_number])
@@ -313,6 +328,7 @@ while True:
 
             # spara i loggboken
         elif card_number in member_register:
+            message_variable.set('Welcome %s' %member_register[card_number])
             #text.delete('1.0', tk.END)
             #text.insert("1.0", 'Welcome ', 'default')
             checkin_member(card_number, member_register[card_number])
@@ -322,46 +338,43 @@ while True:
             time_to_wait = 5
             #text.delete('1.0', tk.END)
             #text.insert("1.0", 'Card not recognised!\nPlease scan again to start a transfer process\nor wait %s seconds to cancel\n' %str(time_to_wait), 'default')
-            root.update()
             old_card_number = card_number
             time_flag = True
             date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
 
-            while (line_count(text.get('1.0',tk.END)) < 5) and (date_time_to_wait > datetime.datetime.now()):
-                #text.delete('1.0', tk.END)
-                #text.insert("1.0", 'Card not recognised!\nPlease scan again to start a transfer process\nor wait %s seconds to cancel\n' %second_counter(date_time_to_wait), 'default')
+            while (line_count(text.get('1.0',tk.END)) < 2) and (date_time_to_wait > datetime.datetime.now()):
+                message_variable.set('Card not recognised!\nPlease scan again to start a transfer process,\nor wait %s seconds to cancel' %second_counter(date_time_to_wait))
                 root.update()
             
-            if not (line_count(text.get('1.0',tk.END)) < 5):
-                new_card_number = '0,' + text.get('4.0',tk.END)
+            if not (line_count(text.get('1.0',tk.END)) < 2):
+                new_card_number = '0,' + text.get('1.0',tk.END)
                 if new_card_number == old_card_number:
-                    #text.delete('1.0', tk.END)
-                    #text.insert("1.0", 'Now scan your old card that you want to transfer\nyour data from, or wait %s seconds to cancel\n' %str(time_to_wait), 'default')
+                    message_variable.set('Now scan your old card that you want to transfer your data from,\nor wait %s seconds to cancel' %str(time_to_wait))
                     date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
-                    while (line_count(text.get('1.0',tk.END)) < 4) and (date_time_to_wait > datetime.datetime.now()):
-                        #text.delete('1.0', tk.END)
-                        #text.insert("1.0", 'Now scan your old card that you want to transfer\nyour data from, or wait %s seconds to cancel\n' %second_counter(date_time_to_wait), 'default')
+                    
+                    while (line_count(text.get('1.0',tk.END)) < 2) and (date_time_to_wait > datetime.datetime.now()):
+                        message_variable.set('Now scan your old card that you want to transfer your data from,\nor wait %s seconds to cancel' %str(time_to_wait))
                         root.update()
-                    if not (line_count(text.get('1.0',tk.END)) < 4):
+                    if not (line_count(text.get('1.0',tk.END)) < 2):
                         file_semaphore.acquire()
                         member_register[new_card_number] = member_register[old_card_number]
                         del member_register[old_card_number]
                         save_memberlist_to_file()
                         file_semaphore.release()
                     else:
-                        #text.delete('1.0', tk.END)
-                        #text.insert("1.0", "Aborted!", 'default')
+                        message_variable.set("Aborted!")
+                        text.delete('1.0', tk.END)
                         root.update()
                         sleep(1)
                 else:
-                    #text.delete('1.0', tk.END)
-                    #text.insert("1.0", "Aborted!", 'default')
+                    message_variable.set("Aborted!")
+                    text.delete('1.0', tk.END)
                     root.update()
                     sleep(1)
 
             else:
-                #text.delete('1.0', tk.END)
-                #text.insert("1.0", "Aborted!", 'default')
+                message_variable.set("Aborted!")
+                text.delete('1.0', tk.END)
                 root.update()
                 sleep(1)
 
