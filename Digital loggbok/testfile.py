@@ -3,8 +3,8 @@
 import os
 import tkinter as tk
 
-import sys
-from threading import Thread, Timer, Semaphore
+import sys, openpyxl
+from threading import Thread, Timer
 from pyautogui import press, typewrite
 from shutil import copyfile
 from os import remove
@@ -111,10 +111,13 @@ checked_in_styret_str = ''
 member_register = {}
 board_members_checkedin = 0
 loggbok = {}
-file_semaphore = Semaphore()
+loggSheet = {}
+latest_save = datetime.datetime.now()
 
 def init_log():
+    global loggbok
     loggbok = openpyxl.load_workbook('Loggbok.xlsx')
+    global loggSheet
     loggSheet = loggbok.active
 
 # Spara listan externt loggbok.save('info/Loggbok_extern.xlsx')
@@ -123,28 +126,22 @@ def save():
 
 # Bakgrundsloop som uppdaterar loggboken vid behov
 # samt tömmer loggboken vid ett visst klockslag
-def bg_main():
-    while True:
-        time_now = datetime.datetime.now().strftime("%H:%M:%S")  # kolla klockan
+def timed_functions():
+    time_now = datetime.datetime.now()  # kolla klockan
+    time_now_str = time_now.strftime("%H:%M:%S")
 
-        if time_now >= ('04:00:00') and time_now <= ('05:00:10'):  # Mellan 4 & 5
-            import_new_members()
-            clear()
-            init_member_register()
-        #save()
-        time.sleep(3600)
-
-
-
-
-#t_bgmain = Thread(target=bg_main)
-#t_bgmain.start()
+    if time_now_str >= ('04:00:00') and time_now_str <= ('05:00:10') and (latest_save + datetime.timedelta(hours = 2) < time_now) :  # Mellan 4 & 5
+        # Show message initializing databases, please hold
+        import_new_members()
+        save_memberlist_to_file()
+        save_all_members()
+        clear()
+        init_member_register()
 
 def import_new_members():
-    file_semaphore.acquire()
     # Använd bara denna på natten eller något.
     medreg = openpyxl.load_workbook('Nyamedlemmar.xlsx')
-    medSheet = medreg.get_sheet_by_name('Medlemsregister')
+    medSheet = medreg[medreg.sheetnames[0]]
     for row in range(2, medSheet.max_row + 1):
         keyCard = medSheet['A' + str(row)].value
         name =  medSheet['B' + str(row)].value
@@ -160,7 +157,6 @@ def import_new_members():
     medreg.save('Nyamedlemmar.xlsx')
     medreg._archive.close()
     save_memberlist_to_file()
-    file_semaphore.release()    
 
 def save_memberlist_to_file():
     medreg = openpyxl.Workbook()
@@ -184,13 +180,14 @@ def clear():
     checked_in_styret = {}
 
 def members_to_str(checked_in, split_at):
-    tmp = []
-    name_count = 0
+    list_of_names_tmp = []
+    list_of_names = []
     for keys in checked_in:
-        idx = name_count // split_at
-        tmp[idx] = tmp[idx] + checked_in[keys][0] + '\n'
-        name_count = name_count + 1
-    return tmp
+       list_of_names_tmp.append(checked_in[keys][0])
+    nbr_of_elems = len(list_of_names_tmp) // split_at
+    for idx in range(0, nbr_of_elems+1):
+        list_of_names.append('\n'.join(list_of_names_tmp[idx*split_at:((idx+1)*split_at)-1]))
+    return list_of_names
 
 def second_counter(datetime_wait_until):
     return str(int((datetime_wait_until - datetime.datetime.now()).seconds) + 1)
@@ -201,34 +198,33 @@ def exit_program():
 
 
 def update_lists():
+    cv.delete('styret_names')
+    cv.delete('member_names')
     next_col = 300
     checked_in_members_str = members_to_str(checked_in_members, 16)
     checked_in_styret_str = members_to_str(checked_in_styret, 10)
     idx = 0
     for items in checked_in_styret_str:
         cv.create_text(styret_namelist_offsetX + next_col*idx, styret_namelist_offsetY, 
-                        fill=namelist_color, font=namelist_font, anchor='nw', text=items)
+                        fill=namelist_color, font=namelist_font, anchor='nw', text=items, tag='styret_names')
         idx = idx + 1
     
     idx = 0
     for items in checked_in_members_str:
         cv.create_text(member_namelist_offsetX + next_col*idx, member_namelist_offsetY,
-                        fill=namelist_color, font=namelist_font, anchor='nw', text=items)
+                        fill=namelist_color, font=namelist_font, anchor='nw', text=items, tag='member_names')
         idx = idx + 1
 
-
-# Fixa semafor till denna funktion
 def init_member_register():
-    file_semaphore.acquire()
     medreg = openpyxl.load_workbook('Medlemsregister.xlsx')
-    medSheet = medreg.get_sheet_by_name('Medlemsregister')
+    medSheet = medreg[medreg.sheetnames[0]]
+    global member_register
     member_register = {}
     for row in range(2, medSheet.max_row + 1):
         keyCard = medSheet['A' + str(row)].value
         name =  medSheet['B' + str(row)].value
-        member_register[key] = (name, medSheet['C' + str(row)].value == 'Styret')
-    medreg._archive.close()
-    file_semaphore.release()
+        member_register[keyCard] = (name, medSheet['C' + str(row)].value == 'Styret')
+    medreg.close()
 
 def mv_incheckade_png():
     nbr_checked_in_members = len(checked_in_members)
@@ -258,6 +254,24 @@ commands = {
 def line_count(string):
     return sum(1 for char in string if char == '\n')
 
+def save_all_members():
+    for key in checked_in_members:
+        member = checked_in_members[key]
+        time_checkedin = member[2]
+        row = str(loggSheet.max_row + 1)
+        loggSheet['A' + row] = member[1] # date
+        loggSheet['B' + row] = member[0] # name
+        loggSheet['C' + row] = time_checkedin
+    for key in checked_in_styret:
+        member = checked_in_styret[key]
+        time_checkedin = member[2]
+        row = str(loggSheet.max_row + 1)
+        loggSheet['A' + row] = member[1] # date
+        loggSheet['B' + row] = member[0] # name
+        loggSheet['C' + row] = time_checkedin
+
+        
+
 def save_to_logg(member):
     date_time_now = datetime.datetime.now()
     time_now_str = date_time_now.strftime("%H:%M:%S")
@@ -266,9 +280,9 @@ def save_to_logg(member):
     loggSheet['A' + row] = member[1] # date
     loggSheet['B' + row] = member[0] # name
     loggSheet['C' + row] = time_checkedin
-    loggSheet['C' + row] = time_now_str
+    loggSheet['D' + row] = time_now_str
     if time_now_str < time_checkedin:
-        loggSheet['D' + row] = "Late checkout"
+        loggSheet['E' + row] = "Late checkout"
 
 def checkin_member(key, member):
     date_time_now = datetime.datetime.now()
@@ -281,18 +295,18 @@ def checkin_member(key, member):
 
 # Start of main here
 
-#init_member_register()
-#init_log()
+init_member_register()
+init_log()
 
-#update_lists()
+update_lists()
 
 #mv_incheckade_png()
 
 while True:
-
     update_lists()
     message_variable.set("Please swipe your card")
     while line_count(text.get('1.0',tk.END+"-1c")) < 1:
+        timed_functions()
         root.update()
      
 
@@ -304,32 +318,38 @@ while True:
         func()
     else:
         card_number = '0,' + card_number
-
         # Number was read
         date_time_now = datetime.datetime.now()
         time_now_str = date_time_now.strftime("%H:%M:%S")
         date_now_str = date_time_now.strftime("%Y-%m-%d")
 
         if card_number in checked_in_members:
-            message_variable.set('Goodbye %s' %checked_in_members[card_number])
+            message_variable.set('Goodbye %s' %checked_in_members[card_number][0])
             save_to_logg(checked_in_members[card_number])
+            del checked_in_members[card_number]
+            update_lists()
+            root.update()
             sleep(2)
             # spara i loggboken
         elif card_number in checked_in_styret:   
-            message_variable.set('Goodbye %s' %checked_in_styret[card_number])
-            save_to_logg(checked_in_members[card_number])
+            message_variable.set('Goodbye %s' %checked_in_styret[card_number][0])
+            save_to_logg(checked_in_styret[card_number])
+            del checked_in_styret[card_number]
+            update_lists()
+            root.update()
             sleep(2)
 
             # spara i loggboken
         elif card_number in member_register:
-            message_variable.set('Welcome %s' %member_register[card_number])
+            message_variable.set('Welcome %s' %member_register[card_number][0])
             checkin_member(card_number, member_register[card_number])
+            update_lists()
+            root.update()
             sleep(2)
             # då ska vi checka in
         else:
             time_to_wait = 5
             old_card_number = card_number
-            print(old_card_number)
             time_flag = True
             date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
 
@@ -339,20 +359,23 @@ while True:
             
             if not (line_count(text.get('1.0',tk.END+"-1c")) < 1):
                 new_card_number = '0,' + text.get('1.0',tk.END+"-1c")[:-1]
-                print(new_card_number)
                 if new_card_number == old_card_number:
-                    message_variable.set('Now scan your old card that you want to transfer your data from,\nor wait %s seconds to cancel' %str(time_to_wait))
                     date_time_to_wait = datetime.datetime.now() + datetime.timedelta(0,time_to_wait)
                     
                     while (line_count(text.get('1.0',tk.END+"-1c")) < 1) and (date_time_to_wait > datetime.datetime.now()):
                         message_variable.set('Now scan your old card that you want to transfer your data from,\nor wait %s seconds to cancel' %str(time_to_wait))
                         root.update()
+                    new_card_number = '0,' + text.get('1.0',tk.END+"-1c")[:-1]
                     if not (line_count(text.get('1.0',tk.END+"-1c")) < 1):
-                        file_semaphore.acquire()
-                        member_register[new_card_number] = member_register[old_card_number]
-                        del member_register[old_card_number]
-                        save_memberlist_to_file()
-                        file_semaphore.release()
+                        text.delete('1.0', tk.END)
+                        if old_card_number in member_register:
+                            member_register[new_card_number] = member_register[old_card_number]
+                            del member_register[old_card_number]
+                            save_memberlist_to_file()
+                        else:
+                            message_variable.set('Old card not in member database...\nTransfer failed.')
+                            root.update()
+                            sleep(3)
                     else:
                         message_variable.set("Aborted!")
                         text.delete('1.0', tk.END)
