@@ -1,0 +1,128 @@
+
+import member, datetime, openpyxl
+
+class XlsxHandler(object):
+    
+    days_saved_online = 30
+    path_to_logg_online = 'Loggbok_online.xlsx'
+    path_to_member_register = 'Medlemsregister.xlsx'
+    path_to_new_members = 'Nyamedlemmar.xlsx'
+    path_to_datalogger = ''
+    latest_save = None
+    #path_to_logg_online = 'info/Loggbok_online.xlsx'
+    #path_to_member_register = '/mnt/www/Medlemsregister.xlsx'
+    #path_to_new_members = '/mnt/www/Nyamedlemmar.xlsx'
+    #path_to_datalogger = '/mnt/www/datalog/'
+    def __init__(self):
+        global loggbok
+        loggbok = openpyxl.load_workbook(self.path_to_logg_online)
+        global loggSheet
+        loggSheet = loggbok.active
+        self.init_member_register()
+        global latest_save
+        latest_save = datetime.datetime.now()
+    
+    def init_member_register(self):
+        medreg = openpyxl.load_workbook(self.path_to_member_register)
+        medSheet = medreg[medreg.sheetnames[0]]
+        for row in range(2, medSheet.max_row + 1):
+            keyCard = medSheet['A' + str(row)].value
+            name =  medSheet['B' + str(row)].value
+            board_member = medSheet['C' + str(row)].value == 'Styret'
+            member.Member(keyCard, name, board_member)
+
+
+    def clean_earliest_loggbook(self):
+        global loggSheet
+        date_today = datetime.datetime.now()
+        removed_rows = 0
+        for row in range(2, loggSheet.max_row):
+            time = loggSheet['A'+str(row)].value
+            if time == None or \
+            (date_today - date_today.strptime(time,"%Y-%m-%d")).days > days_saved_online:
+                loggSheet.delete_rows(row-idx_removed, 1)
+                idx_removed = idx_removed + 1
+
+    def save(self):
+            loggbok.save(path_to_logg_online)
+            # ERROR ERROR ERROR FIX THIS
+            current_month = datetime.now().strftime('%Y%B')
+            loggbok.save('%s%s.xlsx' %(path_to_datalogger, current_month))
+            global latest_save
+            latest_save = datetime.datetime.now()
+
+    def cardreader_parser(cardkey_str):
+        cardreader_bits = 24
+        cardkey_binary = bin(int(cardkey_str))
+        cardkey_binary_appended = '0'*cardreader_bits + cardkey_binary
+        return ('0,%i' %int(cardkey_binary_appended[-cardreader_bits:], 2))
+
+    def import_new_members(self):
+        # Använd bara denna på natten eller något.
+        medreg = openpyxl.load_workbook(path_to_new_members)
+        medSheet = medreg[medreg.sheetnames[0]]
+        for row in range(2, medSheet.max_row + 1):
+            keyCard = cardreader_parser(medSheet['A' + str(row)].value)
+            name =  medSheet['B' + str(row)].value
+            board_member = medSheet['C' + str(row)].value == 'Styret'
+            Member(keyCard, name, board_member)
+        medreg.close()
+        medreg = openpyxl.Workbook()
+        medSheet = medreg.active
+        medSheet.title = 'Nya medlemmar'
+        medSheet['A1'] = 'Nyckelnr'
+        medSheet['B1'] = 'Namn'
+        medSheet['C1'] = 'Styrelsemedlem'
+        medreg.save(path_to_new_members)
+        medreg.close()
+        save_memberlist_to_file()
+
+    def save_memberlist_to_file(self):
+        medreg = openpyxl.Workbook()
+        medSheet = medreg.active
+        medSheet.title = 'Medlemsregister'
+        medSheet['A1'] = '0,Nyckelnr'
+        medSheet['B1'] = 'Namn'
+        medSheet['C1'] = 'Styrelsemedlem'
+        row = 2
+        for member in Member.member_register:
+            medSheet['A' + str(row)] = member.key_card
+            medSheet['B' + str(row)] = member.name
+            if member.board_member:
+                medSheet['C' + str(row)] = 'Styret'
+        medreg.save(path_to_member_register)
+        medreg.close()
+
+    def save_all_members(self):
+        global loggSheet
+        for members in Member.checked_in_members:
+            row = str(loggSheet.max_row + 1)
+            loggSheet['A' + row] = members.getCheckinDate()
+            loggSheet['B' + row] = members.getName()
+            loggSheet['C' + row] = members.getCheckedInTime()
+        for members in Member.checked_in_styret:
+            row = str(loggSheet.max_row + 1)
+            loggSheet['A' + row] = members.getCheckinDate()
+            loggSheet['B' + row] = members.getName()
+            loggSheet['C' + row] = members.getCheckedInTime()
+        global latest_save
+        latest_save = datetime.datetime.now()
+
+    def save_to_logg(self, member):
+        time_now_str = datetime.datetime.now().strftime("%H:%M:%S")
+        global loggSheet
+        row = str(loggSheet.max_row + 1)
+        loggSheet['A' + row] = member.getCheckinDate()
+        loggSheet['B' + row] = member.getName()
+        loggSheet['C' + row] = member.getCheckedInTime()
+        loggSheet['D' + row] = time_now_str
+        if time_now_str < member.getCheckedInTime():
+            loggSheet['E' + row] = "Late checkout"
+
+
+
+
+
+
+
+     
