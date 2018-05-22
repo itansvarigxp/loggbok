@@ -86,8 +86,6 @@ class LoggbookGUI(object):
             namelist_offsetX = self.member_namelist_offsetX
             namelist_offsetY = self.member_namelist_offsetY
         for items in list_of_memberstring:
-            print("item is " + items)
-            print("tag is " + list_tag)
             self.cv.create_text(namelist_offsetX + next_col * idx, namelist_offsetY,
                             fill=self.namelist_color, font=self.namelist_font, anchor='nw', text=items, tag=list_tag)
             idx = idx + 1

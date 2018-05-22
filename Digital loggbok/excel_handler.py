@@ -9,21 +9,23 @@ class XlsxHandler(object):
     path_to_new_members = 'Nyamedlemmar.xlsx'
     path_to_datalogger = ''
     latest_save = None
+    loggbok = None
+    loggSheet = None
     #path_to_logg_online = 'info/Loggbok_online.xlsx'
     #path_to_member_register = '/mnt/www/Medlemsregister.xlsx'
     #path_to_new_members = '/mnt/www/Nyamedlemmar.xlsx'
     #path_to_datalogger = '/mnt/www/datalog/'
     def __init__(self):
         global loggbok
-        loggbok = openpyxl.load_workbook(self.path_to_logg_online)
+        XlsxHandler.loggbok = openpyxl.load_workbook(XlsxHandler.path_to_logg_online)
         global loggSheet
-        loggSheet = loggbok.active
-        self.init_member_register()
+        XlsxHandler.loggSheet = XlsxHandler.loggbok.active
+        XlsxHandler.init_member_register()
         global latest_save
-        latest_save = datetime.datetime.now()
+        XlsxHandler.latest_save = datetime.datetime.now()
     
-    def init_member_register(self):
-        medreg = openpyxl.load_workbook(self.path_to_member_register)
+    def init_member_register():
+        medreg = openpyxl.load_workbook(XlsxHandler.path_to_member_register)
         medSheet = medreg[medreg.sheetnames[0]]
         for row in range(2, medSheet.max_row + 1):
             keyCard = medSheet['A' + str(row)].value
@@ -43,13 +45,13 @@ class XlsxHandler(object):
                 loggSheet.delete_rows(row-idx_removed, 1)
                 idx_removed = idx_removed + 1
 
-    def save(self):
-            loggbok.save(path_to_logg_online)
+    def save():
+            XlsxHandler.loggbok.save(XlsxHandler.path_to_logg_online)
             # ERROR ERROR ERROR FIX THIS
-            current_month = datetime.now().strftime('%Y%B')
-            loggbok.save('%s%s.xlsx' %(path_to_datalogger, current_month))
+            current_month = datetime.datetime.now().strftime('%Y%B')
+            XlsxHandler.loggbok.save('%s%s.xlsx' %(XlsxHandler.path_to_datalogger, current_month))
             global latest_save
-            latest_save = datetime.datetime.now()
+            XlsxHandler.latest_save = datetime.datetime.now()
 
     def cardreader_parser(cardkey_str):
         cardreader_bits = 24
@@ -57,7 +59,7 @@ class XlsxHandler(object):
         cardkey_binary_appended = '0'*cardreader_bits + cardkey_binary
         return ('0,%i' %int(cardkey_binary_appended[-cardreader_bits:], 2))
 
-    def import_new_members(self):
+    def import_new_members():
         # Använd bara denna på natten eller något.
         medreg = openpyxl.load_workbook(path_to_new_members)
         medSheet = medreg[medreg.sheetnames[0]]
@@ -77,7 +79,7 @@ class XlsxHandler(object):
         medreg.close()
         save_memberlist_to_file()
 
-    def save_memberlist_to_file(self):
+    def save_memberlist_to_file():
         medreg = openpyxl.Workbook()
         medSheet = medreg.active
         medSheet.title = 'Medlemsregister'
@@ -93,7 +95,7 @@ class XlsxHandler(object):
         medreg.save(path_to_member_register)
         medreg.close()
 
-    def save_all_members(self):
+    def save_all_members():
         global loggSheet
         for members in Member.checked_in_members:
             row = str(loggSheet.max_row + 1)
@@ -108,16 +110,16 @@ class XlsxHandler(object):
         global latest_save
         latest_save = datetime.datetime.now()
 
-    def save_to_logg(self, member):
+    def save_to_logg(member):
         time_now_str = datetime.datetime.now().strftime("%H:%M:%S")
-        global loggSheet
-        row = str(loggSheet.max_row + 1)
-        loggSheet['A' + row] = member.getCheckinDate()
-        loggSheet['B' + row] = member.getName()
-        loggSheet['C' + row] = member.getCheckedInTime()
-        loggSheet['D' + row] = time_now_str
+        row = str(XlsxHandler.loggSheet.max_row + 1)
+        XlsxHandler.loggSheet['A' + row] = member.getCheckinDate()
+        XlsxHandler.loggSheet['B' + row] = member.getName()
+        XlsxHandler.loggSheet['C' + row] = member.getCheckedInTime()
+        XlsxHandler.loggSheet['D' + row] = time_now_str
         if time_now_str < member.getCheckedInTime():
-            loggSheet['E' + row] = "Late checkout"
+            XlsxHandler.loggSheet['E' + row] = "Late checkout"
+        XlsxHandler.save()
 
 
 

@@ -1,5 +1,5 @@
 
-import datetime
+import datetime, excel_handler
 
 class Member(object):
     checked_in_members = {}
@@ -15,7 +15,7 @@ class Member(object):
         global member_register
         self.member_register[key_card] = self
 
-    def setCheckInTime(time_object):
+    def setCheckInTime(self, time_object):
         self.checkin_time = time_object.strftime("%H:%M:%S")
         self.checkin_date = time_object.strftime("%Y-%m-%d")
 
@@ -23,10 +23,10 @@ class Member(object):
         member.setCheckInTime(datetime.datetime.now())
         if (member.board_member):
             global checked_in_styret
-            checked_in_styret[member.key_card] = member
+            Member.checked_in_styret[member.key_card] = member
         else:
             global checked_in_members
-            checked_in_members[member.key_card] = member
+            Member.checked_in_members[member.key_card] = member
 
     def getName(self):
         return self.name
@@ -50,7 +50,7 @@ class Member(object):
         list_of_names_tmp = []
         list_of_names = []
         for member in member_dict:
-           list_of_names_tmp.append(member.getName())
+           list_of_names_tmp.append(member_dict[member].getName())
         nbr_of_elems = len(list_of_names_tmp) // split_at
         for idx in range(0, nbr_of_elems+1):
             list_of_names.append('\n'.join(list_of_names_tmp[idx*split_at:((idx+1)*split_at)-1]))
@@ -73,6 +73,6 @@ class Member(object):
             del Member.checked_in_styret[key_card]
         else:
             return None
-        save_to_logg(member)
+        excel_handler.XlsxHandler.save_to_logg(member)
         return member.getName()
 
