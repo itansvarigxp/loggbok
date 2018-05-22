@@ -80,10 +80,10 @@ xlsx_object = excel_handler.XlsxHandler()
 
 
 while True:
-    member_str = member.Member.checkedInStyretToStr(16)
+    member_str = member.Member.checkedInMembersToStr(16)
     styret_str = member.Member.checkedInStyretToStr(12)
-    gui_object.update_lists(member_str,'styret_names')
-    gui_object.update_lists(styret_str,'members_names')
+    gui_object.update_lists(styret_str,'styret_names')
+    gui_object.update_lists(member_str,'member_names')
     flag = True
 #    mv_incheckade_png()
     while not gui_object.has_lines():
@@ -108,11 +108,15 @@ while True:
             gui_object.message('Goodbye %s' %name, 2)
             # spara i loggboken
         elif card_number in member.Member.member_register:
-            member = member.Member.member_register[card_number]
-            member.checkIn(card_number, member_register[card_number])
-            gui_object.message('Welcome %s' %member.getName(), 2)
-            if member.getBoardmember():
-                gui_object.update_lists(Member.toListStr(Member.checked_in_styret, 12), 'styret_names')
+            member_local = member.Member.member_register[card_number]
+            member.Member.checkIn(member_local)
+            gui_object.message('Welcome %s' %member_local.getName(), 2)
+            print(member.Member.checked_in_styret)
+            print(member.Member.checked_in_members)
+            if (member_local.getBoardmember()):
+                gui_object.update_lists(member.Member.toListStr(member.Member.checked_in_styret, 12), 'styret_names') # bugg i to string
+            else:
+                gui_object.update_lists(member.Member.toListStr(member.Member.checked_in_members, 16), 'member_names')
             # då ska vi checka in
         else:
             time_to_wait = 5
