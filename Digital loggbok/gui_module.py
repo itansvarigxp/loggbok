@@ -1,5 +1,5 @@
 import tkinter as tk
-import datetime as dt
+from datetime import datetime, timedelta
 
 styret_namelist = ""
 member_namelist = ""
@@ -36,7 +36,6 @@ styret_namelist_offsetY = styret_title_offsetY + namelist_row_padding + title_si
 member_namelist_offsetX = namelist_col_padding
 member_namelist_offsetY = member_title_offsetY + namelist_row_padding + title_size
 interactive_area_width = main_window_width
-
 message_height = message_area_height - input_area_height
 message_area_width = main_window_width
 message_width = message_area_width
@@ -56,14 +55,20 @@ photo = tk.PhotoImage(data=data_bytes)
 cv.configure(width=665, height=660)
 cv.pack(side=tk.TOP, expand=False)
 cv.create_image(25, 25, image=photo, anchor='nw')
+
 cv.create_text(member_title_offsetX, member_title_offsetY, fill=title_color,
-						 font=title_font, anchor='nw', text=member_title)
+               font=title_font, anchor='nw', text=member_title)
 cv.create_text(styret_title_offsetX, styret_title_offsetY, fill=title_color,
-						font=title_font, anchor='nw', text=styret_title)
-interactive_area = tk.Frame(root, bg=message_area_bg_color, width = interactive_area_width, height = interactive_area_height)
-message_area = tk.Frame(interactive_area, bg=message_area_bg_color, width = message_area_width, height = message_area_height, bd = 0)
-message = tk.Message(message_area, bg=message_area_bg_color, width = 500, fg = message_area_fg_color, textvariable = message_variable)
-text = tk.Text(interactive_area, height=input_area_height, width=input_area_width, bg=input_area_bg_color, foreground=input_area_fg_color, bd = 0)
+               font=title_font, anchor='nw', text=styret_title)
+interactive_area = tk.Frame(root, bg=message_area_bg_color,width=interactive_area_width,
+                            height=interactive_area_height)
+message_area = tk.Frame(interactive_area, bg=message_area_bg_color,
+                        width=message_area_width, height=message_area_height, bd = 0)
+message = tk.Message(message_area, bg=message_area_bg_color, width=500, 
+                     fg=message_area_fg_color, textvariable=message_variable)
+text = tk.Text(interactive_area, height=input_area_height, width=input_area_width,
+               bg=input_area_bg_color, foreground=input_area_fg_color, bd = 0)
+
 interactive_area.pack(side=tk.BOTTOM, expand=False)
 message_area.pack(side=tk.TOP, expand = False)
 message_area.pack_propagate(False)
@@ -72,7 +77,7 @@ message.configure(font=('Arial', 18, 'bold'))
 message.pack(side=tk.TOP, expand=False)
 text.pack(side=tk.BOTTOM, expand=False)
 text.focus()
-latest_message_time = dt.datetime.now()
+latest_message_time = datetime.now()
 
 def update_lists(list_of_memberstring, list_tag):
     cv.delete(list_tag)
@@ -86,13 +91,15 @@ def update_lists(list_of_memberstring, list_tag):
         namelist_offsetY = member_namelist_offsetY
     for items in list_of_memberstring:
         cv.create_text(namelist_offsetX + next_col * idx, namelist_offsetY,
-                        fill=namelist_color, font=namelist_font, anchor='nw', text=items, tag=list_tag)
+                        fill=namelist_color, font=namelist_font, anchor='nw', 
+                        text=items, tag=list_tag)
         idx = idx + 1
     root.update()
 
 def message(message_string, message_time=0):
     message_variable.set(message_string)
-    latest_message_time = dt.datetime.now() + dt.timedelta(0,message_time)
+    global latest_message_time
+    latest_message_time = datetime.now() + timedelta(0,message_time)
     root.update()
 
 def has_lines():

@@ -1,11 +1,12 @@
 
-import datetime, excel_handler
+from datetime import datetime
+import excel_handler as XlsxHandler
 
 class Member(object):
     checked_in_members = {}
     checked_in_styret = {}
     member_register = {}
-    
+
     def __init__(self, key_card, name, board_member = False):
         self.key_card = key_card
         self.name = name
@@ -19,7 +20,7 @@ class Member(object):
         self.checkin_date = time_object.strftime("%Y-%m-%d")
 
     def checkIn(member):
-        member.setCheckInTime(datetime.datetime.now())
+        member.setCheckInTime(datetime.now())
         if (member.board_member):
             Member.checked_in_styret[member.key_card] = member
         else:
@@ -66,6 +67,6 @@ class Member(object):
             del Member.checked_in_styret[key_card]
         else:
             return None
-        excel_handler.XlsxHandler.save_to_logg(member)
+        XlsxHandler.save_to_log(member)
         return member.getName()
 
