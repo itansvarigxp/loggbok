@@ -19,7 +19,6 @@ loggSheet = loggbok.active
 
 
 def init_member_register():
-    #global path_to_member_register
     medreg = openpyxl.load_workbook(path_to_member_register)
     medSheet = medreg[medreg.sheetnames[0]]
     for row in range(2, medSheet.max_row + 1):
@@ -51,19 +50,18 @@ def save():
 
 def cardreader_parser(cardkey_str):
     cardreader_bits = 24
-    cardkey_binary = bin(int(cardkey_str))
+    cardkey_binary = bin(int(cardkey_str))[2:]
     cardkey_binary_appended = '0'*cardreader_bits + cardkey_binary
     return ('0,%i' %int(cardkey_binary_appended[-cardreader_bits:], 2))
 
 def import_new_members():
-    # Använd bara denna på natten eller något.
     medreg = openpyxl.load_workbook(path_to_new_members)
     medSheet = medreg[medreg.sheetnames[0]]
     for row in range(2, medSheet.max_row + 1):
         keyCard = cardreader_parser(medSheet['A' + str(row)].value)
         name =  medSheet['B' + str(row)].value
         board_member = medSheet['C' + str(row)].value == 'Styret'
-        Member(keyCard, name, board_member)
+        member.Member(keyCard, name, board_member)
     medreg.close()
     medreg = openpyxl.Workbook()
     medSheet = medreg.active
@@ -83,29 +81,35 @@ def save_memberlist_to_file():
     medSheet['B1'] = 'Namn'
     medSheet['C1'] = 'Styrelsemedlem'
     row = 2
-    for member in Member.member_register:
-        medSheet['A' + str(row)] = member.key_card
-        medSheet['B' + str(row)] = member.name
-        if member.board_member:
+    for key in member.Member.member_register:
+        members = member.Member.member_register[key]
+        medSheet['A' + str(row)] = members.key_card
+        medSheet['B' + str(row)] = members.name
+        if members.board_member:
             medSheet['C' + str(row)] = 'Styret'
+        else:
+            medSheet['C' + str(row)] = None
+        row += 1
     medreg.save(path_to_member_register)
     medreg.close()
 
 def save_all_checkedin_to_log():
-    for members in Member.checked_in_members:
+    for key in member.Member.checked_in_members:
         row = str(loggSheet.max_row + 1)
+        members = member.Member.checked_in_members[key]
         loggSheet['A' + row] = members.getCheckinDate()
         loggSheet['B' + row] = members.getName()
         loggSheet['C' + row] = members.getCheckedInTime()
-    for members in Member.checked_in_styret:
+    for key in member.Member.checked_in_styret:
         row = str(loggSheet.max_row + 1)
+        members = member.Member.checked_in_styret[key]
         loggSheet['A' + row] = members.getCheckinDate()
         loggSheet['B' + row] = members.getName()
         loggSheet['C' + row] = members.getCheckedInTime()
-    latest_save = datetime.now()
     save()
 
 def save_to_log(member):
+    print(member)
     time_now_str = datetime.now().strftime("%H:%M:%S")
     row = str(loggSheet.max_row + 1)
     loggSheet['A' + row] = member.getCheckinDate()

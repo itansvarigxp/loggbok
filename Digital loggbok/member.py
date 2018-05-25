@@ -38,6 +38,12 @@ class Member(object):
     def getCheckinDate(self):
         return self.checkin_date
 
+    def changeKeyCard(self, new_key_card):
+        del Member.member_register[self.key_card]
+        self.key_card = new_key_card
+        Member.member_register[self.key_card] = self
+
+
     def clearCheckedIn():
         Member.checked_in_members = {}
         Member.checked_in_styret = {}
