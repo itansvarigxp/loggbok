@@ -1,5 +1,6 @@
 
-from datetime import datetime
+from datetime import datetime, date, timedelta
+from string import ascii_uppercase
 import openpyxl
 import member
 import paths
@@ -8,6 +9,10 @@ import paths
 days_saved_online = 21
 latest_save = datetime.now()
 data_logging = True
+ascii_sheet = list(ascii_uppercase) + list(map(lambda y : 'A' + y, list(ascii_uppercase))) \
+                                    + list(map(lambda y : 'B' + y, list(ascii_uppercase)))
+
+
 
 
 # Om det finns en loggbok online så laddas den in, annar skapas en ny.
@@ -23,6 +28,19 @@ except:
     loggSheet['D1'] = 'Utcheckning'
     loggSheet['E1'] = 'Anmärkning'
 
+
+def exctractYesterdayFromLog():
+    yesterday = date.today() - timedelta(1)
+    list_of_checkins = []
+    for row in range(2, loggSheet.max_row):
+        date = datetime.strptime(loggSheet['A'+str(row)].value,"%Y-%m-%d").date()
+        if date == yesterday:
+            name =loggSheet['B' + row]
+            checkin = loggSheet['C' + row]
+            checkout = loggSheet['D' + row]
+            list_of_checkins.append({'name': name, 'checkin': checkin, 'checkout':checkout})
+    return list_of_checkins
+
 # Initierar medlemsregistret. Om den misslyckas så skrivs det ut i konsolen
 def initMemberRegister():
     try:
@@ -32,7 +50,8 @@ def initMemberRegister():
             keyCard = medSheet['A' + str(row)].value
             name =  medSheet['B' + str(row)].value
             board_member = medSheet['C' + str(row)].value == 'Styret'
-            member.Member(keyCard, name, board_member)
+            latest_activity = medSheet['D' + str(row)].value
+            member.Member(keyCard, name, board_member, )
     except:
         print("Could not find member register.\n" +
               "Please place the member register in the following folder\n" + 
@@ -40,7 +59,7 @@ def initMemberRegister():
 
 
 # Rensar loggbok online från inloggningar som är äldre än days_saved_online
-def cleanEarliestLoggbook(self):
+def cleanEarliestLoggbook():
     date_today = datetime.now()
     removed_rows = 0
     for row in range(2, loggSheet.max_row):
@@ -77,10 +96,11 @@ def importNewMembers():
         medreg = openpyxl.load_workbook(paths.xlsx_new_members)
         medSheet = medreg[medreg.sheetnames[0]]
         for row in range(2, medSheet.max_row + 1):
-            keyCard = cardreaderParser(medSheet['A' + str(row)].value)
+            key_card = cardreaderParser(medSheet['A' + str(row)].value)
             name =  medSheet['B' + str(row)].value
             board_member = medSheet['C' + str(row)].value == 'Styret'
-            member.Member(keyCard, name, board_member)
+            latest_activity = datetime.now().strftime("%Y-%m-%d")
+            member.Member(key_card, name, board_member, latest_activity)
         medreg.close()
     except:
         pass
@@ -102,15 +122,17 @@ def saveMemberlistToFile():
     medSheet['A1'] = '0,Nyckelnr'
     medSheet['B1'] = 'Namn'
     medSheet['C1'] = 'Styrelsemedlem'
+    medSheet['D1'] = 'Senast aktivitet'
     row = 2
     for key in member.Member.member_register:
         members = member.Member.member_register[key]
-        medSheet['A' + str(row)] = members.key_card
-        medSheet['B' + str(row)] = members.name
-        if members.board_member:
+        medSheet['A' + str(row)] = members.getKeyCardNumber()
+        medSheet['B' + str(row)] = members.getName()
+        if members.getBoardmember():
             medSheet['C' + str(row)] = 'Styret'
         else:
             medSheet['C' + str(row)] = None
+        medSheet['D' + str(row)] = members.getLatestActivity()
         row += 1
     medreg.save(paths.xlsx_member_register)
     medreg.close()
@@ -149,35 +171,3 @@ def saveToLog(member):
         loggSheet['E' + row] = "Late checkout"
 
 
-# Här kommer statistikdefinitioner komma.
-# Ska sparas: anonymiserad data där antal unika
-# besökare loggas, inloggade halvtima för halvtimma
-# mellan 18:00 - 00:00 på vardagar, 06:00 - 24 på helger
-# skilja mellan styret och vanliga medlemmar
-# spara denna data dagligen i olika filer för varje månad
-# 
-def saveStatistics():
-    today = datetime.now()
-    try:
-        statistics = openpyxl.load_workbook(paths.xlsx_statistics + today.strftime('%Y%B'))
-        stat_sheet = statistics.active
-    except:
-        statistics = openpyxl.Workbook()
-        stat_sheet = statistics.active
-        stat_sheet['A1'] = 'Unika besökare'
-        stat_sheet['B1'] = 'Totalt antal timmar i verkstaden'
-        stat_sheet['C1'] = 'Styret antal timmar i verkstaden'
-        stat_sheet['D1'] = 'Antal incheckningar totalt'
-        #stat_sheet['E1'] = 'Tid med högst beläggning per halvtimma'
-
-
-    row = stat_sheet.max_row
-    stat_sheet['A' + row] = countUniqueVisitors()
-    stat_sheet['B' + row] = countTotalHours()
-    stat_sheet['C' + row] = countTotalHoursStyret()
-    stat_sheet['D' + row] = countTotalCheckins()
-    #stat_sheet['E' + row] = findTimeMostMembers()
-
-
-
-     

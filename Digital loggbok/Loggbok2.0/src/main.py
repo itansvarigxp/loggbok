@@ -2,6 +2,7 @@
 
 from member import *
 import excel_handler as XlsxHandler
+import statistics_handler as StatLogger
 import gui_module as GUI
 from datetime import datetime, timedelta
 import sys
@@ -107,11 +108,14 @@ while True:
         date_now_str = date_time_now.strftime("%Y-%m-%d")
         # Antingen var det en incheckad medlem eller inte. Var medlemmen
         # incheckad redan så checkas denne ut av klassmetoden checkout
-        name = Member.checkOut(card_number)
-        if name != None:
+        member = Member.checkOut(card_number)
+        if member != None:
             # Om checkOut returnerar ett namn
-            GUI.message('Goodbye %s' %name, 2)
+            GUI.message('Goodbye %s' %member.getName(), 2)
             # Spara den aktuella loggboken i excel
+            StatLogger.checkOutStat(member)
+            XlsxHandler.statLogger(member)
+            del member
             XlsxHandler.save()
 
         elif card_number in Member.member_register:
@@ -121,13 +125,16 @@ while True:
             Member.checkIn(member_local)
             GUI.message('Welcome %s' %member_local.getName(), 2)
 
+            #XlsxHandler.checkinUniqueLogger(card_number)
             # Beroende på om det är en styrelsemedlem eller ej så uppdateras
             # antingen texten tillhörande medlemmar eller den tillhörande
             # styret
             if (member_local.getBoardmember()):
+            	StatLogger.checkInsStyret()
                 GUI.updateLists(Member.toListStr(Member.checked_in_styret, 12),
                                  'styret_names')
             else:
+            	StatLogger.checkInsMember()
                 GUI.updateLists(Member.toListStr(Member.checked_in_members, 16), 
                                  'member_names')
         # Om kortnumret inte finns sparat i medlemsdatabasen, initiera bytesprocessen
@@ -161,7 +168,10 @@ while True:
                         if old_card_number in Member.member_register:
                             local_member = Member.member_register[old_card_number]
                             local_member.changeKeyCard(new_card_number)
+                            StatLogger.changeCardStat(new_card_number, old_card_number)
                             XlsxHandler.saveMemberlistToFile()
+
+                            #changeCardUniqueLogger(new_card_number, old_card_number):
                             # Annars så meddelas användare att kortet inte finns i databasen
                         else:
                             message_string = ("Old card not in member database..."

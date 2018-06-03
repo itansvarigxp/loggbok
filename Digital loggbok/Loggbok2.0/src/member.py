@@ -12,18 +12,18 @@ class Member(object):
     member_register = {}
 
     # Konstruktor
-    def __init__(self, key_card, name, board_member = False):
+    def __init__(self, key_card, name, board_member = False, latest_activity = None):
         self.key_card = key_card
         self.name = name
         self.board_member = board_member
         self.checkin_time = None
-        self.checkin_date = None
+        self.latest_activity = latest_activity
         Member.member_register[key_card] = self
 
     # Sätter incheckningstiden och incheckningsdatum
     def setCheckInTime(self, time_object):
-        self.checkin_time = time_object.strftime("%H:%M:%S")
-        self.checkin_date = time_object.strftime("%Y-%m-%d")
+        self.checkin_time = time_object
+        
 
     # Checkar in en medlem i klassvariabeln
     def checkIn(member):
@@ -43,11 +43,23 @@ class Member(object):
 
     # Returnerar tiden som objektet checkade in
     def getCheckedInTime(self):
-        return self.checkin_time
+        return self.checkin_time.time_object.strftime("%H:%M:%S")
 
     # Returnerar datumet som objektet checkade in
     def getCheckinDate(self):
-        return self.checkin_date
+        return self.checkin_time.strftime("%Y-%m-%d")
+
+    def getCheckInTimeObject(self):
+        return self.checkin_time
+
+    def getKeyCardNumber(self):
+        return self.key_card
+
+    def getLatestActivity(self):
+        return self.latest_activity
+
+    def setLatestActivity(self):
+        self.latest_activity = datetime.now().strftime("%Y-%m-%d")
 
     # Används vid byte av nyckelkort
     def changeKeyCard(self, new_key_card):
@@ -93,7 +105,7 @@ class Member(object):
         else:
             return None
         XlsxHandler.saveToLog(member)
-        return member.getName()
+        return member
 
     def nbrCheckedInMembersNow():
         return len(Member.checked_in_members)
