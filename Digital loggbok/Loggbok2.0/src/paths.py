@@ -21,3 +21,12 @@ xlsx_logg_online = reg_path + file_name_logg_online
 xlsx_member_register = reg_path + file_name_member_register
 xlsx_new_members = reg_path + file_name_new_member_register
 xlsx_datalogger = ''
+
+
+# ska fixas
+
+'/mnt/www/incheckade/'
+'/mnt/www/incheckade/incheckade.png'
+
+'/mnt/www/incheckade/'
+'/mnt/www/incheckade/styret.png'

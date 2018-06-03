@@ -4,23 +4,6 @@ from collections import OrderedDict
 import member
 from excel_handler import ascii_sheet
 
-
-statistics_categories = OrderedDict([('Unika besökare idag': uniqueVisitorsToday),
-                         ('Unika besökare denna månad': uniqueVisitorsMonth),
-                         ('Totalt antal timmar i verkstaden idag': totalTimeToday),
-                         ('Styret antal timmar i verkstaden idag': totalTimeTodayStyret),
-                         ('Totalt antal timmar i verkstaden denna månad': totalTimeMonth),
-                         ('Styret antal timmar i verkstaden denna månad': totalTimeMonthStyret),
-                         ('Antal incheckningar totalt idag': checkinsToday),
-                         ('Genomsnittlig daglig verksamhet': dailyMean),
-                         ('Standardavvikelse': calcDailyStd),
-                         ('Genomsnittlig tid i verkstaden': monthlyMean),
-                         ('Standardavvikelse': calcMonthlyStd),
-                         ('Styret genomsnittlig tid i verkstaden': monthlyMeanStyret),
-                         ('Styret Standardavvikelse'),
-                         ('Glömda utcheckningar': member.Member.nbrCheckedInNow)])
-
-
 unique_visitors_this_month = {'CURRENTMONTH': date.today().strftime('%b'), \
                               'TOTALTIME': timedelta(0)}
 unique_visitors_today = {'CURRENTDAY': date.today().strftime('%d/%m'), \
@@ -36,11 +19,11 @@ checkin_members = 0
 checkin_styret = 0
 
 def uniqueVisitorsToday():
-    return len(unique_visitors_today) - preset_values +
+    return len(unique_visitors_today) - preset_values + \
            len(unique_styret_today) - preset_values
 
 def uniqueVisitorsMonth():
-    return len(unique_visitors_this_month) - preset_values +
+    return len(unique_visitors_this_month) - preset_values + \
            len(unique_styret_this_month) - preset_values
 
 def checkinsToday():
@@ -67,17 +50,18 @@ def totalTimeToday():
     return unique_visitors_today['TOTALTIME']
 
 def totalTimeTodayStyret():
-    return unique_visitors_today['TOTALTIME_STYRET']
+    return unique_styret_today['TOTALTIME']
 
 def totalTimeMonth():
     return unique_visitors_this_month['TOTALTIME']
 
 def totalTimeMonthStyret():
-    return unique_visitors_this_month['TOTALTIME_STYRET']
+    return unique_styret_this_month['TOTALTIME']
 
 def checkOutStat(member):
     key_card = member.getKeyCardNumber()
     time_in_workshop = datetime.now() - member.getCheckInTimeObject()
+    
     if member.getBoardmember:
         if key_card in unique_styret_today: 
             unique_styret_today[key_card] += time_in_workshop
@@ -87,19 +71,20 @@ def checkOutStat(member):
             unique_styret_this_month[key_card] += time_in_workshop
         else:
             unique_styret_this_month[key_card] = time_in_workshop
+
         unique_styret_this_month['TOTALTIME'] += time_in_workshop
         unique_styret_today['TOTALTIME'] += time_in_workshop
+
+    if key_card in unique_visitors_today:
+        unique_visitors_today[key_card] += time_in_workshop
     else:
-        if key_card in unique_visitors_today:
-            unique_visitors_today[key_card] += time_in_workshop
-        else:
-            unique_visitors_today[key_card] = time_in_workshop
-        if key_card in unique_visitors_this_month:
-            unique_visitors_this_month[key_card] += time_in_workshop
-        else:
-            unique_visitors_this_month[key_card] = time_in_workshop
-        unique_visitors_this_month['TOTALTIME'] += time_in_workshop
-        unique_visitors_today['TOTALTIME'] += time_in_workshop
+        unique_visitors_today[key_card] = time_in_workshop
+    if key_card in unique_visitors_this_month:
+        unique_visitors_this_month[key_card] += time_in_workshop
+    else:
+        unique_visitors_this_month[key_card] = time_in_workshop
+    unique_visitors_this_month['TOTALTIME'] += time_in_workshop
+    unique_visitors_today['TOTALTIME'] += time_in_workshop
 
 def changeCardStat(key_card, old_key_card):
     if old_key_card in unique_visitors_today:
@@ -108,6 +93,7 @@ def changeCardStat(key_card, old_key_card):
     if old_key_card in unique_visitors_this_month:
         unique_visitors_this_month[key_card] = unique_visitors_this_month[old_key_card]
         del unique_visitors_this_month[old_key_card]
+
     if old_key_card in unique_styret_today:
         unique_styret_today[key_card] = unique_styret_today[old_key_card]
         del unique_styret_today[old_key_card]
@@ -115,60 +101,83 @@ def changeCardStat(key_card, old_key_card):
         unique_styret_this_month[key_card] = unique_styret_this_month[old_key_card]
         del unique_styret_this_month[old_key_card]
 
-def dailyMean():
-    return calcMean(unique_visitors_today, preset_values)
-
-def monthlyMean():
-    return calcMean(unique_visitors_this_month, preset_values)
-    
-def monthlyMeanStyret():
-    accu = timedelta(0)
-    N = 0
-    for unique_members in unique_visitors_this_month
-        if not unique_members in excluded_keys:
-            if unique_visitors_this_month[unique_members]['styret']:
-                accu += unique_visitors_this_month[unique_members]['time_acc']
-                N += 1
+def calcMean(total_time, N):
     try:
-        accu /= N
-    except:
-        accu = timedelta(0)
-    return accu
-
-def monthlyStdStyret():
-    mean = monthlyMeanStyret()
-
-
-
-def calcDailyStd():
-    return calcStd()
-
-def calcMean(visitor_dict, nbr_excluded_values):
-    try:
-        mean = visitor_dict['TOTALTIME']/(len(visitor_dict) - nbr_excluded_values)
+        mean = total_time / N
     except:
         mean = 0
     return mean
 
-
-def calcStd(visitor_dict, nbr_excluded_values):
-    expected = calcMean(visitor_dict, nbr_excluded_values)
-    N = len(visitor_dict) - nbr_excluded_values
+def calcStdDev(visitor_dict, N, expected_value):
     accu = timedelta(0)
     for unique_members in visitor_dict:
         if not unique_members in excluded_keys:
-            accu += pow(visitor_dict[unique_members]['time_acc'] - mean, 2)
+            accu += pow(visitor_dict[unique_members] - expected_value, 2)
     try:
         accu = sqrt(accu / N)
     except:
-        pass
+        accu = timedelta(0)
     return accu
 
+def dailyMean():
+    return calcMean(unique_visitors_today['TOTALTIME'],
+                    len(unique_visitors_today) - preset_values)
+def monthlyMean():
+    return calcMean(unique_visitors_this_month['TOTALTIME'],
+                    len(unique_visitors_this_month) - preset_values)
 
+def monthlyMeanStyret():
+    return calcMean(unique_styret_this_month['TOTALTIME'],
+                    len(unique_styret_this_month) - preset_values)
+
+def monthlyStdDevStyret():
+    expected_value = monthlyMeanStyret()
+    N = len(unique_styret_this_month) - preset_values
+    return calcStd(unique_styret_this_month, N, expected_value)
+
+def monthlyStdDev():
+    expected_value = monthlyMean()
+    N = len(unique_visitors_this_month) - preset_values
+    return calcStd(unique_visitors_this_month, N, expected_value)
+
+def dailyStdDev():
+    expected_value = dailyMean()
+    N = len(unique_visitors_today) - preset_values
+    return calcStd(unique_visitors_today, N, expected_value)
+
+
+statistics_categories = OrderedDict([('Unika besökare idag', uniqueVisitorsToday),
+                         ('Unika besökare denna månad', uniqueVisitorsMonth),
+                         ('Totalt antal timmar i verkstaden idag', totalTimeToday),
+                         ('Styret antal timmar i verkstaden idag', totalTimeTodayStyret),
+                         ('Totalt antal timmar i verkstaden denna månad', totalTimeMonth),
+                         ('Styret antal timmar i verkstaden denna månad', totalTimeMonthStyret),
+                         ('Antal incheckningar totalt idag', checkinsToday),
+                         ('Genomsnittlig daglig verksamhet', dailyMean),
+                         ('Standardavvikelse', dailyStdDev),
+                         ('Genomsnittlig tid i verkstaden', monthlyMean),
+                         ('Standardavvikelse', monthlyStdDev),
+                         ('Styret genomsnittlig tid i verkstaden', monthlyMeanStyret),
+                         ('Styret Standardavvikelse', monthlyStdDevStyret),
+                         ('Glömda utcheckningar', member.Member.nbrCheckedInNow)])
+
+def resetMonth():
+    global unique_visitors_this_month
+    global unique_styret_this_month
+    unique_visitors_this_month = {'CURRENTMONTH': date.today().strftime('%b'), \
+                              'TOTALTIME': timedelta(0)}
+    unique_styret_this_month = {'CURRENTMONTH': date.today().strftime('%b'), \
+                            'TOTALTIME': timedelta(0)}
+
+def resetToday():
+    global unique_styret_today
+    global unique_visitors_today
+    unique_visitors_today = {'CURRENTDAY': date.today().strftime('%d/%m'), \
+                             'TOTALTIME': timedelta(0)}
+    unique_styret_today = {'CURRENTDAY': date.today().strftime('%d/%m'), \
+                           'TOTALTIME': timedelta(0)}
 
 def saveStatistics():
-    global unique_visitors_this_month
-    global unique_visitors_today
     today = date.today()
     current_date = today.strftime('%m/%d')
     current_month = today.strftime('%b')
@@ -178,8 +187,20 @@ def saveStatistics():
     except:
         statistics = openpyxl.Workbook()
         stat_sheet = statistics.active
-        for i in range(0,len(statistics_categories)):
-            stat_sheet[ascii_sheet[i]+'1'] = statistics_categories[i]
+        index = 0
+        for ordered_key in statistics_categories:
+            stat_sheet[ascii_sheet[i]+'1'] = ordered_key
+            index += 1
+    row = str(stat_sheet.max_row + 1)
+    index = 0
+    for ordered_key in statistics_categories:
+        stat_sheet[ascii_sheet[i]+row] = statistics_categories[ordered_key]()
+
+    if unique_visitors_this_month['CURRENTMONTH'] != current_month:
+        resetMonth()
+    if unique_visitors_today['CURRENTDAY'] != current_date:
+        resetToday()
+    stat_sheet.save('%s%s.xlsx' %(paths.xlsx_statistics, today.strftime('%Y%B')))
 
 
 

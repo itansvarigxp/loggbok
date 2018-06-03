@@ -98,8 +98,7 @@ while True:
     if card_number in commands:
         # Om det var ett av specialkommandon i variabeln commands, kör
         # funktionen
-        func = commands[card_number]
-        func()
+        commands[card_number]()
     else:
         # Annars var det en medlem som checkade in. Spara numret parsat
         # med 0, som i excelfilen
@@ -130,13 +129,13 @@ while True:
             # antingen texten tillhörande medlemmar eller den tillhörande
             # styret
             if (member_local.getBoardmember()):
-            	StatLogger.checkInsStyret()
-                GUI.updateLists(Member.toListStr(Member.checked_in_styret, 12),
-                                 'styret_names')
+                StatLogger.tickCheckInsStyret()
+                GUI.updateLists(Member.toListStr(Member.checked_in_styret, 12), 
+                                'styret_names')
             else:
-            	StatLogger.checkInsMember()
+                StatLogger.tickCheckInsMember()
                 GUI.updateLists(Member.toListStr(Member.checked_in_members, 16), 
-                                 'member_names')
+                                'member_names')
         # Om kortnumret inte finns sparat i medlemsdatabasen, initiera bytesprocessen
         else:
             old_card_number = card_number
