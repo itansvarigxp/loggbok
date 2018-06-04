@@ -19,16 +19,16 @@ excluded_keys = ['CURRENTMONTH', 'TOTALTIME', 'CURRENTDAY']
 checkin_members = 0
 checkin_styret = 0
 
+def yesterday():
+    return (date.today() - timedelta(1)).strftime('%d/%m')
+
 # Returnerar antalet unika besökare för dagen
 def uniqueVisitorsToday():
-    return len(unique_visitors_today) - preset_values + \
-           len(unique_styret_today) - preset_values
+    return len(unique_visitors_today) - preset_values
 
 # Returnerar antalet unika besökare denna månad
 def uniqueVisitorsMonth():
-    return len(unique_visitors_this_month) - preset_values + \
-           len(unique_styret_this_month) - preset_values
-
+    return len(unique_visitors_this_month) - preset_values
 # Returnerar antalet incheckningar idag
 def checkinsToday():
     return checkin_members + checkin_styret
@@ -76,8 +76,8 @@ def totalTimeMonthStyret():
 def checkOutStat(member):
     key_card = member.getKeyCardNumber()
     time_in_workshop = datetime.now() - member.getCheckInTimeObject()
-    
-    if member.getBoardmember:
+
+    if member.getBoardmember():
         if key_card in unique_styret_today: 
             unique_styret_today[key_card] += time_in_workshop
         else:
@@ -86,7 +86,6 @@ def checkOutStat(member):
             unique_styret_this_month[key_card] += time_in_workshop
         else:
             unique_styret_this_month[key_card] = time_in_workshop
-
         unique_styret_this_month['TOTALTIME'] += time_in_workshop
         unique_styret_today['TOTALTIME'] += time_in_workshop
 
@@ -129,12 +128,12 @@ def calcMean(total_time, N):
 # Funktion för att räkna ut standardavvikelsen över tiden som spenderas i
 # verkstaden
 def calcStdDev(visitor_dict, N, expected_value):
-    accu = timedelta(0)
+    accu = 0
     for unique_members in visitor_dict:
         if not unique_members in excluded_keys:
-            accu += pow(visitor_dict[unique_members] - expected_value, 2)
+            accu += pow(visitor_dict[unique_members].seconds - expected_value.seconds, 2)
     try:
-        accu = sqrt(accu / N)
+        accu = timedelta(seconds=sqrt(accu / N))
     except:
         accu = timedelta(0)
     return accu
@@ -160,19 +159,19 @@ def monthlyMeanStyret():
 def monthlyStdDevStyret():
     expected_value = monthlyMeanStyret()
     N = len(unique_styret_this_month) - preset_values
-    return calcStd(unique_styret_this_month, N, expected_value)
+    return calcStdDev(unique_styret_this_month, N, expected_value)
 
 # Standardavvikelsen för alla medlemmar månadsvis
 def monthlyStdDev():
     expected_value = monthlyMean()
     N = len(unique_visitors_this_month) - preset_values
-    return calcStd(unique_visitors_this_month, N, expected_value)
+    return calcStdDev(unique_visitors_this_month, N, expected_value)
 
 # Standardavvikelsen för alla medlemmar dagligen
 def dailyStdDev():
     expected_value = dailyMean()
     N = len(unique_visitors_today) - preset_values
-    return calcStd(unique_visitors_today, N, expected_value)
+    return calcStdDev(unique_visitors_today, N, expected_value)
 
 # Resetar listan för unika besökare denna månaden
 def resetMonth():

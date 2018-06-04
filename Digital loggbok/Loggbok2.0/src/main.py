@@ -38,29 +38,38 @@ def mvIncheckadePNG():
 
 def timedFunctions():
     #Funktioner som körs inom bestämda tidsintervall varje dygn.
-
+    #print('in timed function')
     time_now = datetime.now() 
     time_now_str = time_now.strftime("%H:%M:%S")
-
+    #print(time_now)
+    #print((XlsxHandler.latest_save + timedelta(hours = 0, minutes = 1))
     # Debugga denna
     if  time_now_str >= ('04:00:00') and \
         time_now_str <= ('05:00:10') and \
-        (XlsxHandler.latest_save + timedelta(hours = 2) < time_now): 
+        (XlsxHandler.latest_save + timedelta(hours = 0, minutes = 1) < time_now): 
         #Mellan 4 och 5 på morgonen rensas loggboken, de som fortfarande är
         #incheckade blir sparade. Nya medlemmar importeras till medlemsregistret
         message_string = "Updating registers, please hold..."
         GUI.message(message_string)
         # Dagens statistik loggas. Måste göras innan de som glömt att checka ut
         # rensas ur loggboken
+        print('in timed functions')
         XlsxHandler.saveStatistics()
         StatLogger.resetCheckins()
+        print('save statistik done')
         XlsxHandler.cleanEarliestLoggbook()
+        print('clean cleanEarliestLoggbook done')
         XlsxHandler.importNewMembers()
+        print('import new members done')
         XlsxHandler.saveMemberlistToFile()
+        print('save memverlist to file done')
         XlsxHandler.save()
+        print('save loggbook to file done')
         Member.clearCheckedIn()
         XlsxHandler.initMemberRegister()
+        print('init member register done')
         GUI.message("Please swipe your card")
+        sys.exit()
         
 # Kommandon som kan skrivas i programmet för att kalla på motsvarande funktion
 commands = {
@@ -117,7 +126,7 @@ while True:
             GUI.message('Goodbye %s' %member.getName(), 2)
             # Spara den aktuella loggboken i excel
             StatLogger.checkOutStat(member)
-            XlsxHandler.statLogger(member)
+            XlsxHandler.saveToLog(member)
             del member
             XlsxHandler.save()
 

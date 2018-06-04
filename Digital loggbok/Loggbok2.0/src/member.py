@@ -43,7 +43,7 @@ class Member(object):
 
     # Returnerar tiden som objektet checkade in
     def getCheckedInTime(self):
-        return self.checkin_time.time_object.strftime("%H:%M:%S")
+        return self.checkin_time.strftime("%H:%M:%S")
 
     # Returnerar datumet som objektet checkade in
     def getCheckinDate(self):

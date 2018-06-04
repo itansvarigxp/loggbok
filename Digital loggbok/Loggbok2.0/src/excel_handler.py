@@ -14,7 +14,8 @@ data_logging = True
 ascii_sheet = list(ascii_uppercase) + list(map(lambda y : 'A' + y, list(ascii_uppercase))) \
                                     + list(map(lambda y : 'B' + y, list(ascii_uppercase)))
 
-statistics_categories = OrderedDict([('Unika besökare idag', StatLogger.uniqueVisitorsToday),
+statistics_categories = OrderedDict([('Datum', StatLogger.yesterday),
+                         ('Unika besökare idag', StatLogger.uniqueVisitorsToday),
                          ('Unika besökare denna månad', StatLogger.uniqueVisitorsMonth),
                          ('Totalt antal timmar i verkstaden idag', StatLogger.totalTimeToday),
                          ('Styret antal timmar i verkstaden idag', StatLogger.totalTimeTodayStyret),
@@ -80,7 +81,7 @@ def cleanEarliestLoggbook():
     for row in range(2, loggSheet.max_row):
         time = loggSheet['A'+str(row)].value
         if time == None or \
-        (date_today - strptime(time,"%Y-%m-%d")).days > days_saved_online:
+        (date_today - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online:
             loggSheet.delete_rows(row-idx_removed, 1)
             idx_removed = idx_removed + 1
 
@@ -174,7 +175,6 @@ def saveAllCheckedinToLog():
 # inte till excelfilen automatiskt. Detta görs i funktionen
 # save)
 def saveToLog(member):
-    print(member)
     time_now_str = datetime.now().strftime("%H:%M:%S")
     row = str(loggSheet.max_row + 1)
     loggSheet['A' + row] = member.getCheckinDate()
@@ -190,24 +190,25 @@ def saveStatistics():
     current_date = today.strftime('%m/%d')
     current_month = today.strftime('%b')
     try:
-        statistics = openpyxl.load_workbook(paths.xlsx_statistics + today.strftime('%Y%B'))
+        statistics = openpyxl.load_workbook('%s%s.xlsx' %(paths.xlsx_statistics, today.strftime('%Y%B')))
         stat_sheet = statistics.active
     except:
         statistics = openpyxl.Workbook()
         stat_sheet = statistics.active
         index = 0
         for ordered_key in statistics_categories:
-            stat_sheet[ascii_sheet[i]+'1'] = ordered_key
+            stat_sheet[ascii_sheet[index]+'1'] = ordered_key
             index += 1
     row = str(stat_sheet.max_row + 1)
     index = 0
     for ordered_key in statistics_categories:
-        stat_sheet[ascii_sheet[i]+row] = statistics_categories[ordered_key]()
+        stat_sheet[ascii_sheet[index]+row] = statistics_categories[ordered_key]()
+        index += 1
 
-    if unique_visitors_this_month['CURRENTMONTH'] != current_month:
-        resetMonth()
-    if unique_visitors_today['CURRENTDAY'] != current_date:
-        resetToday()
-    stat_sheet.save('%s%s.xlsx' %(paths.xlsx_statistics, today.strftime('%Y%B')))
+    if StatLogger.unique_visitors_this_month['CURRENTMONTH'] != current_month:
+        StatLogger.resetMonth()
+    if StatLogger.unique_visitors_today['CURRENTDAY'] != current_date:
+        StatLogger.resetToday()
+    statistics.save('%s%s.xlsx' %(paths.xlsx_statistics, today.strftime('%Y%B')))
 
 
