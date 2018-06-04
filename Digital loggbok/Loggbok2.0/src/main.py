@@ -69,7 +69,6 @@ def timedFunctions():
         XlsxHandler.initMemberRegister()
         print('init member register done')
         GUI.message("Please swipe your card")
-        sys.exit()
         
 # Kommandon som kan skrivas i programmet för att kalla på motsvarande funktion
 commands = {
