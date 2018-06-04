@@ -76,16 +76,16 @@ def initMemberRegister():
 
 # Rensar loggbok online från inloggningar som är äldre än days_saved_online
 def cleanEarliestLoggbook():
+    print("Cleaning of loggbook initialized!")
     date_today = datetime.today()
-    print(date_today)
     idx_removed = 0
     for row in range(2, loggSheet.max_row):
         time = loggSheet['A'+str(row)].value
         if time == None or \
         (date_today - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online:
             loggSheet.delete_rows(row-idx_removed, 1)
-            idx_removed = idx_removed + 1
-
+            idx_removed += 0
+    print("Cleaning of loggbook done!")
 # Sparar ned loggboken på fil
 def save():
         loggbok.save(paths.xlsx_logg_online)
