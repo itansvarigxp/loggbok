@@ -84,7 +84,7 @@ def cleanEarliestLoggbook():
         if time == None or \
         (date_today - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online:
             loggSheet.delete_rows(row-idx_removed, 1)
-            idx_removed += 0
+            idx_removed += 1
     print("Cleaning of loggbook done!")
 # Sparar ned loggboken på fil
 def save():
