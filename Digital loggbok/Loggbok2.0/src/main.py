@@ -69,10 +69,10 @@ commands = {
     'clear' : Member.clearCheckedIn,
     'save' : XlsxHandler.save,
     'update' : XlsxHandler.initMemberRegister,
-    'saveAllCheckedinToLog' : XlsxHandler.saveAllCheckedinToLog,
-    'saveMemberlistToFile' : XlsxHandler.saveMemberlistToFile,
-    'importNewMembers' : XlsxHandler.importNewMembers,
-    'cleanEarliestLoggbook' : XlsxHandler.cleanEarliestLoggbook
+    'save checkedin' : XlsxHandler.saveAllCheckedinToLog,
+    'save members' : XlsxHandler.saveMemberlistToFile,
+    'import' : XlsxHandler.importNewMembers,
+    'clean' : XlsxHandler.cleanEarliestLoggbook
 }
 
 

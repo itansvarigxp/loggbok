@@ -101,10 +101,13 @@ def updateLists(list_of_memberstring, list_tag):
     root.update()
 
 def message(message_string, message_time=0):
-    message_variable.set(message_string)
     global latest_message_time
     latest_message_time = datetime.now() + timedelta(0,message_time)
-    root.update()
+    if message_string == message_variable:
+        return
+    else:
+        message_variable.set(message_string)
+        root.update()
 
 # Kollar om det finns en ny rad i input-text rutan
 def hasLines():
