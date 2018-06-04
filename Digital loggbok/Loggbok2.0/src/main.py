@@ -49,8 +49,11 @@ def timedFunctions():
         #Mellan 4 och 5 på morgonen rensas loggboken, de som fortfarande är
         #incheckade blir sparade. Nya medlemmar importeras till medlemsregistret
         message_string = "Updating registers, please hold..."
-        GUI.message(message_string) 
-        StatLogger.saveStatistics()
+        GUI.message(message_string)
+        # Dagens statistik loggas. Måste göras innan de som glömt att checka ut
+        # rensas ur loggboken
+        XlsxHandler.saveStatistics()
+        
         XlsxHandler.cleanEarliestLoggbook()
         XlsxHandler.importNewMembers()
         XlsxHandler.saveMemberlistToFile()
@@ -168,6 +171,8 @@ while True:
                         if old_card_number in Member.member_register:
                             local_member = Member.member_register[old_card_number]
                             local_member.changeKeyCard(new_card_number)
+                            # Kortet byts även ut i statistiken för att inte felaktigt registrera
+                            # för många medlemmar
                             StatLogger.changeCardStat(new_card_number, old_card_number)
                             XlsxHandler.saveMemberlistToFile()
 

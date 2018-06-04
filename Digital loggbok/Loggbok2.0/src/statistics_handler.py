@@ -2,6 +2,8 @@ from datetime import datetime, date, timedelta
 from math import sqrt
 import member
 
+# Initierar olika variabler som används för statistikföring. Styret
+# loggas både tillsammans med medlemmar och för sig.
 unique_visitors_this_month = {'CURRENTMONTH': date.today().strftime('%b'), \
                               'TOTALTIME': timedelta(0)}
 unique_visitors_today = {'CURRENTDAY': date.today().strftime('%d/%m'), \
@@ -10,40 +12,50 @@ unique_styret_today = {'CURRENTDAY': date.today().strftime('%d/%m'), \
                        'TOTALTIME': timedelta(0)}
 unique_styret_this_month = {'CURRENTMONTH': date.today().strftime('%b'), \
                             'TOTALTIME': timedelta(0)}
-
+# Förinsatta nycklar i dictionary är 2 stycken. Dessa är nycklar om inte
+# tillhör ett kortnummer                    
 preset_values = len(unique_visitors_today)
 excluded_keys = ['CURRENTMONTH', 'TOTALTIME', 'CURRENTDAY']
 checkin_members = 0
 checkin_styret = 0
 
+# Returnerar antalet unika besökare för dagen
 def uniqueVisitorsToday():
     return len(unique_visitors_today) - preset_values + \
            len(unique_styret_today) - preset_values
 
+# Returnerar antalet unika besökare denna månad
 def uniqueVisitorsMonth():
     return len(unique_visitors_this_month) - preset_values + \
            len(unique_styret_this_month) - preset_values
 
+# Returnerar antalet incheckningar idag
 def checkinsToday():
     return checkin_members + checkin_styret
 
+# Resetar checkinvariablerna till 0
 def resetCheckins():
     global checkin_styret
     global checkin_members
     checkin_members = 0
     checkin_styret = 0
 
+# Ökar checkin med 1
 def tickCheckInsMember():
     global checkin_members
     checkin_members += 1
 
+# Ökar styrets checkin med 1
 def tickCheckInsStyret():
     global checkin_styret
     checkin_styret += 1
 
+# Returnerar antalet inloggade just nu. Om denna kallas efter klockan
+# 00:00 så kan dessa ses som att de glömt checka ut
 def forgottenCheckOuts():
     return member.Member.nbrCheckedInNow()
 
+# 
 def totalTimeToday():
     return unique_visitors_today['TOTALTIME']
 
