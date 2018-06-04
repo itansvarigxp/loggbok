@@ -21,7 +21,7 @@ webpage_resources_path = '/home/eXPerimentverkstaden/incheckade/'
 
 # filnamn
 file_name_bg = 'bg.gif'
-file_name_logg_online = 'Loggbok_online.xlsx'
+file_name_logg_online = 'Loggbok_extern.xlsx'
 file_name_member_register = 'Medlemsregister.xlsx'
 file_name_new_member_register = 'Nyamedlemmar.xlsx'
 # hela sökvägen
