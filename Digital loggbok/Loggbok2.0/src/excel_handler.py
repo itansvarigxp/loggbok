@@ -77,7 +77,7 @@ def initMemberRegister():
 # Rensar loggbok online från inloggningar som är äldre än days_saved_online
 def cleanEarliestLoggbook():
     date_today = datetime.now()
-    removed_rows = 0
+    idx_removed = 0
     for row in range(2, loggSheet.max_row):
         time = loggSheet['A'+str(row)].value
         if time == None or \
