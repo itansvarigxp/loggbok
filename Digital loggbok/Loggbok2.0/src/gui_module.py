@@ -14,8 +14,8 @@ input_area_bg_color = 'black'
 input_area_fg_color = 'white'
 namelist_color = "black"
 title_color = "black"
-title_size = 36
-namelist_size = 18
+title_size = 28
+namelist_size = 14
 title_font = ('Arial', title_size, 'bold')
 namelist_font=('Arial', namelist_size)
 
@@ -55,7 +55,7 @@ data_bytes = in_file.read()
 in_file.close()
 photo = tk.PhotoImage(data=data_bytes)
 cv.configure(width=665, height=660)
-cv.pack(side=tk.TOP, expand=False)
+cv.pack(side=tk.TOP, expand=True)
 cv.create_image(25, 25, image=photo, anchor='nw')
 
 cv.create_text(member_title_offsetX, member_title_offsetY, fill=title_color,
@@ -75,7 +75,7 @@ interactive_area.pack(side=tk.BOTTOM, expand=False)
 message_area.pack(side=tk.TOP, expand = False)
 message_area.pack_propagate(False)
 message_variable.set("Please swipe your card")
-message.configure(font=('Arial', 18, 'bold'))
+message.configure(font=('Arial', 14, 'bold'))
 message.pack(side=tk.TOP, expand=False)
 text.pack(side=tk.BOTTOM, expand=False)
 text.focus()
