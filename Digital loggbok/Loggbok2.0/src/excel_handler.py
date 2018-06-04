@@ -189,8 +189,9 @@ def saveStatistics():
     today = date.today()
     current_date = today.strftime('%m/%d')
     current_month = today.strftime('%b')
+    yesterday = date.today() - timedelta(1)
     try:
-        statistics = openpyxl.load_workbook('%s%s.xlsx' %(paths.xlsx_statistics, today.strftime('%Y%B')))
+        statistics = openpyxl.load_workbook('%s%s.xlsx' %(paths.xlsx_statistics, yesterday.strftime('%Y%B')))
         stat_sheet = statistics.active
     except:
         statistics = openpyxl.Workbook()
@@ -209,6 +210,6 @@ def saveStatistics():
         StatLogger.resetMonth()
     if StatLogger.unique_visitors_today['CURRENTDAY'] != current_date:
         StatLogger.resetToday()
-    statistics.save('%s%s.xlsx' %(paths.xlsx_statistics, today.strftime('%Y%B')))
+    statistics.save('%s%s.xlsx' %(paths.xlsx_statistics, yesterday.strftime('%Y%B')))
 
 
