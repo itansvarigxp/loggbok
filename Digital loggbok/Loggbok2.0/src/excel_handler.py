@@ -4,6 +4,8 @@ from string import ascii_uppercase
 import openpyxl
 import member
 import paths
+from collections import OrderedDict
+import statistics_handler as StatLogger
 
 # Antal dagar tillbaks i tiden som sparas i loggbok online.
 days_saved_online = 21
@@ -12,7 +14,20 @@ data_logging = True
 ascii_sheet = list(ascii_uppercase) + list(map(lambda y : 'A' + y, list(ascii_uppercase))) \
                                     + list(map(lambda y : 'B' + y, list(ascii_uppercase)))
 
-
+statistics_categories = OrderedDict([('Unika besökare idag', StatLogger.uniqueVisitorsToday),
+                         ('Unika besökare denna månad', StatLogger.uniqueVisitorsMonth),
+                         ('Totalt antal timmar i verkstaden idag', StatLogger.totalTimeToday),
+                         ('Styret antal timmar i verkstaden idag', StatLogger.totalTimeTodayStyret),
+                         ('Totalt antal timmar i verkstaden denna månad', StatLogger.totalTimeMonth),
+                         ('Styret antal timmar i verkstaden denna månad', StatLogger.totalTimeMonthStyret),
+                         ('Antal incheckningar totalt idag', StatLogger.checkinsToday),
+                         ('Genomsnittlig daglig verksamhet', StatLogger.dailyMean),
+                         ('Standardavvikelse', StatLogger.dailyStdDev),
+                         ('Genomsnittlig tid i verkstaden', StatLogger.monthlyMean),
+                         ('Standardavvikelse', StatLogger.monthlyStdDev),
+                         ('Styret genomsnittlig tid i verkstaden', StatLogger.monthlyMeanStyret),
+                         ('Styret Standardavvikelse', StatLogger.monthlyStdDevStyret),
+                         ('Glömda utcheckningar', StatLogger.forgottenCheckOuts)])
 
 
 # Om det finns en loggbok online så laddas den in, annar skapas en ny.
@@ -169,5 +184,30 @@ def saveToLog(member):
     # Om medlemmen checkar ut efter 00:00 så noteras det
     if time_now_str < member.getCheckedInTime():
         loggSheet['E' + row] = "Late checkout"
+
+def saveStatistics():
+    today = date.today()
+    current_date = today.strftime('%m/%d')
+    current_month = today.strftime('%b')
+    try:
+        statistics = openpyxl.load_workbook(paths.xlsx_statistics + today.strftime('%Y%B'))
+        stat_sheet = statistics.active
+    except:
+        statistics = openpyxl.Workbook()
+        stat_sheet = statistics.active
+        index = 0
+        for ordered_key in statistics_categories:
+            stat_sheet[ascii_sheet[i]+'1'] = ordered_key
+            index += 1
+    row = str(stat_sheet.max_row + 1)
+    index = 0
+    for ordered_key in statistics_categories:
+        stat_sheet[ascii_sheet[i]+row] = statistics_categories[ordered_key]()
+
+    if unique_visitors_this_month['CURRENTMONTH'] != current_month:
+        resetMonth()
+    if unique_visitors_today['CURRENTDAY'] != current_date:
+        resetToday()
+    stat_sheet.save('%s%s.xlsx' %(paths.xlsx_statistics, today.strftime('%Y%B')))
 
 

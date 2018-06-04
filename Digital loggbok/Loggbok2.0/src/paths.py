@@ -10,6 +10,10 @@ src_path = project_path + "/src/"
 res_path = project_path + "/res/"
 reg_path = project_path + "/registers/"
 stat_path = project_path + "/statistics/"
+# Absolut mapp
+#webpage_resources_path = '/mnt/www/incheckade/'
+webpage_resources_path = ''
+
 # filnamn
 file_name_bg = 'bg.gif'
 file_name_logg_online = 'Loggbok_online.xlsx'
@@ -20,13 +24,5 @@ gui_bg = res_path + file_name_bg
 xlsx_logg_online = reg_path + file_name_logg_online
 xlsx_member_register = reg_path + file_name_member_register
 xlsx_new_members = reg_path + file_name_new_member_register
+
 xlsx_datalogger = ''
-
-
-# ska fixas
-
-'/mnt/www/incheckade/'
-'/mnt/www/incheckade/incheckade.png'
-
-'/mnt/www/incheckade/'
-'/mnt/www/incheckade/styret.png'

@@ -25,15 +25,15 @@ def mvIncheckadePNG():
     nbr_checked_in_members = len(Member.checked_in_members)
     nbr_checked_in_styret = len(Member.checked_in_styret)
     if nbr_checked_in_members < 11:
-        copyfile('/mnt/www/incheckade/' + nbr_checked_in_members + '.png',
-                    '/mnt/www/incheckade/incheckade.png')
+        copyfile(res_path + nbr_checked_in_members + '.png',
+                   webpage_resources_path + 'incheckade.png')
     else:
-        copyfile('/mnt/www/incheckade/fler.png','/mnt/www/incheckade/incheckade.png')
+        copyfile(res_path + 'fler.png', webpage_resources_path + 'incheckade.png')
+
     if nbr_checked_in_styret < 11:
-        copyfile('/mnt/www/incheckade/' + nbr_checked_in_styret + '.png',
-                    '/mnt/www/incheckade/styret.png')
+        copyfile(res_path + nbr_checked_in_styret + '.png', webpage_resources_path + 'styret.png')
     else:
-        copyfile('/mnt/www/incheckade/fler.png','/mnt/www/incheckade/styret.png')
+        copyfile(res_path + 'fler.png', webpage_resources_path + 'styret.png' )
 
 
 def timedFunctions():
@@ -50,6 +50,7 @@ def timedFunctions():
         #incheckade blir sparade. Nya medlemmar importeras till medlemsregistret
         message_string = "Updating registers, please hold..."
         GUI.message(message_string) 
+        StatLogger.saveStatistics()
         XlsxHandler.cleanEarliestLoggbook()
         XlsxHandler.importNewMembers()
         XlsxHandler.saveMemberlistToFile()

@@ -1,8 +1,6 @@
 from datetime import datetime, date, timedelta
 from math import sqrt
-from collections import OrderedDict
 import member
-from excel_handler import ascii_sheet
 
 unique_visitors_this_month = {'CURRENTMONTH': date.today().strftime('%b'), \
                               'TOTALTIME': timedelta(0)}
@@ -145,22 +143,6 @@ def dailyStdDev():
     N = len(unique_visitors_today) - preset_values
     return calcStd(unique_visitors_today, N, expected_value)
 
-
-statistics_categories = OrderedDict([('Unika besökare idag', uniqueVisitorsToday),
-                         ('Unika besökare denna månad', uniqueVisitorsMonth),
-                         ('Totalt antal timmar i verkstaden idag', totalTimeToday),
-                         ('Styret antal timmar i verkstaden idag', totalTimeTodayStyret),
-                         ('Totalt antal timmar i verkstaden denna månad', totalTimeMonth),
-                         ('Styret antal timmar i verkstaden denna månad', totalTimeMonthStyret),
-                         ('Antal incheckningar totalt idag', checkinsToday),
-                         ('Genomsnittlig daglig verksamhet', dailyMean),
-                         ('Standardavvikelse', dailyStdDev),
-                         ('Genomsnittlig tid i verkstaden', monthlyMean),
-                         ('Standardavvikelse', monthlyStdDev),
-                         ('Styret genomsnittlig tid i verkstaden', monthlyMeanStyret),
-                         ('Styret Standardavvikelse', monthlyStdDevStyret),
-                         ('Glömda utcheckningar', member.Member.nbrCheckedInNow)])
-
 def resetMonth():
     global unique_visitors_this_month
     global unique_styret_this_month
@@ -177,79 +159,8 @@ def resetToday():
     unique_styret_today = {'CURRENTDAY': date.today().strftime('%d/%m'), \
                            'TOTALTIME': timedelta(0)}
 
-def saveStatistics():
-    today = date.today()
-    current_date = today.strftime('%m/%d')
-    current_month = today.strftime('%b')
-    try:
-        statistics = openpyxl.load_workbook(paths.xlsx_statistics + today.strftime('%Y%B'))
-        stat_sheet = statistics.active
-    except:
-        statistics = openpyxl.Workbook()
-        stat_sheet = statistics.active
-        index = 0
-        for ordered_key in statistics_categories:
-            stat_sheet[ascii_sheet[i]+'1'] = ordered_key
-            index += 1
-    row = str(stat_sheet.max_row + 1)
-    index = 0
-    for ordered_key in statistics_categories:
-        stat_sheet[ascii_sheet[i]+row] = statistics_categories[ordered_key]()
-
-    if unique_visitors_this_month['CURRENTMONTH'] != current_month:
-        resetMonth()
-    if unique_visitors_today['CURRENTDAY'] != current_date:
-        resetToday()
-    stat_sheet.save('%s%s.xlsx' %(paths.xlsx_statistics, today.strftime('%Y%B')))
 
 
-
-
-# def uniqueVisitors():
-#     global unique_visitors_this_month
-#     global unique_visitors_today
-#     today = datetime.now()
-#     current_date = today.strftime('%m%d')
-#     current_month = today.strftime('%B')
-#     visitors = {'month':len(unique_visitors_this_month),
-#                 'today': len(unique_visitors_today)}
-#     if not (unique_visitors_today['CURRENTDAY'] == current_date):
-#         unique_visitors_today = {'CURRENTDAY': current_date}
-#     if unique_visitors_this_month['CURRENTMONTH'] == current_month:
-#         return visitors
-#     else:
-#         unique_visitors_this_month = {'CURRENTMONTH': current_month}
-#         return visitors
-
-
-
-# Här kommer statistikdefinitioner komma.
-# Ska sparas: anonymiserad data där antal unika
-# besökare loggas, inloggade halvtima för halvtimma
-# mellan 18:00 - 00:00 på vardagar, 06:00 - 24 på helger
-# skilja mellan styret och vanliga medlemmar
-# spara denna data dagligen i olika filer för varje månad
-# 
-# def logger():
-#     try:
-#         logger = openpyxl.load_workbook(paths.xlsx_statistics + today.strftime('%Y%B') + '_logger')
-#         logger_sheet = logger.active
-#     except:
-#         logger = openpyxl.Workbook()
-#         logger_sheet = logger.active
-#         for i in range(0,2*24)
-#         logger_sheet[ascii_sheet[i] + '1'] = 
-
-# def saveStatistics():
-
-
-
-#     row = stat_sheet.max_row
-#     stat_sheet['A' + row] = countUniqueVisitors()
-#     stat_sheet['B' + row] = countTotalHours()
-#     stat_sheet['C' + row] = countTotalHoursStyret()
-#     stat_sheet['D' + row] = countTotalCheckins()
-#     #stat_sheet['E' + row] = findTimeMostMembers()
 
 
 
