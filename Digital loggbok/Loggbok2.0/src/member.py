@@ -104,7 +104,6 @@ class Member(object):
             del Member.checked_in_styret[key_card]
         else:
             return None
-        XlsxHandler.saveToLog(member)
         return member
 
     def nbrCheckedInMembersNow():

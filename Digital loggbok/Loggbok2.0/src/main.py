@@ -120,7 +120,6 @@ while True:
             # Spara den aktuella loggboken i excel
             StatLogger.checkOutStat(member)
             XlsxHandler.saveToLog(member)
-            del member
             XlsxHandler.save()
 
         elif card_number in Member.member_register:
