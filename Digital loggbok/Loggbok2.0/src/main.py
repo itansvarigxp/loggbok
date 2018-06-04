@@ -53,21 +53,14 @@ def timedFunctions():
         GUI.message(message_string)
         # Dagens statistik loggas. Måste göras innan de som glömt att checka ut
         # rensas ur loggboken
-        print('in timed functions')
         XlsxHandler.saveStatistics()
         StatLogger.resetCheckins()
-        print('save statistik done')
         XlsxHandler.cleanEarliestLoggbook()
-        print('clean cleanEarliestLoggbook done')
         XlsxHandler.importNewMembers()
-        print('import new members done')
         XlsxHandler.saveMemberlistToFile()
-        print('save memverlist to file done')
         XlsxHandler.save()
-        print('save loggbook to file done')
         Member.clearCheckedIn()
         XlsxHandler.initMemberRegister()
-        print('init member register done')
         GUI.message("Please swipe your card")
         
 # Kommandon som kan skrivas i programmet för att kalla på motsvarande funktion
@@ -78,7 +71,8 @@ commands = {
     'update' : XlsxHandler.initMemberRegister,
     'saveAllCheckedinToLog' : XlsxHandler.saveAllCheckedinToLog,
     'saveMemberlistToFile' : XlsxHandler.saveMemberlistToFile,
-    'importNewMembers' : XlsxHandler.importNewMembers
+    'importNewMembers' : XlsxHandler.importNewMembers,
+    'cleanEarliestLoggbook' : XlsxHandler.cleanEarliestLoggbook
 }
 
 
