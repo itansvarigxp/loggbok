@@ -53,7 +53,7 @@ def timedFunctions():
         # Dagens statistik loggas. Måste göras innan de som glömt att checka ut
         # rensas ur loggboken
         XlsxHandler.saveStatistics()
-        
+        StatLogger.resetCheckins()
         XlsxHandler.cleanEarliestLoggbook()
         XlsxHandler.importNewMembers()
         XlsxHandler.saveMemberlistToFile()

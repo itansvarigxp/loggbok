@@ -55,19 +55,24 @@ def tickCheckInsStyret():
 def forgottenCheckOuts():
     return member.Member.nbrCheckedInNow()
 
-# 
+# Retrurnerar total antal tid som spenderats i verkstaden idag
 def totalTimeToday():
     return unique_visitors_today['TOTALTIME']
 
+# Returnerar total antal tid som styret spenderat i verkstaden idag
 def totalTimeTodayStyret():
     return unique_styret_today['TOTALTIME']
 
+# Returnerar total antal tid som spenderats i verkstaden hittills denna månad
 def totalTimeMonth():
     return unique_visitors_this_month['TOTALTIME']
 
+# Returnerar total antal tid som spenderats i verkstaden av styret hittills
+# denna månad
 def totalTimeMonthStyret():
     return unique_styret_this_month['TOTALTIME']
 
+# När en medlem checkar ut så uppdateras alla variabler relaterade till timetracking
 def checkOutStat(member):
     key_card = member.getKeyCardNumber()
     time_in_workshop = datetime.now() - member.getCheckInTimeObject()
@@ -96,6 +101,8 @@ def checkOutStat(member):
     unique_visitors_this_month['TOTALTIME'] += time_in_workshop
     unique_visitors_today['TOTALTIME'] += time_in_workshop
 
+# Om en medlem måste föra över information till ett nytt kort så kopplas
+# medelmmens gamla data till det nya kortet
 def changeCardStat(key_card, old_key_card):
     if old_key_card in unique_visitors_today:
         unique_visitors_today[key_card] = unique_visitors_today[old_key_card]
@@ -111,6 +118,7 @@ def changeCardStat(key_card, old_key_card):
         unique_styret_this_month[key_card] = unique_styret_this_month[old_key_card]
         del unique_styret_this_month[old_key_card]
 
+# Funktion för att räkna ut medeltalet av tiden som spenderats i verkstaden
 def calcMean(total_time, N):
     try:
         mean = total_time / N
@@ -118,6 +126,8 @@ def calcMean(total_time, N):
         mean = 0
     return mean
 
+# Funktion för att räkna ut standardavvikelsen över tiden som spenderas i
+# verkstaden
 def calcStdDev(visitor_dict, N, expected_value):
     accu = timedelta(0)
     for unique_members in visitor_dict:
@@ -129,32 +139,42 @@ def calcStdDev(visitor_dict, N, expected_value):
         accu = timedelta(0)
     return accu
 
+# Räknar ut det dagliga medelvärdet av antal timmar som varje medlem spenderar
+# i verkstaden
 def dailyMean():
     return calcMean(unique_visitors_today['TOTALTIME'],
                     len(unique_visitors_today) - preset_values)
+
+# Räknar ut det månatagliga medelvärdet av antal timmar som varje medlem spenderar
+# i verkstaden
 def monthlyMean():
     return calcMean(unique_visitors_this_month['TOTALTIME'],
                     len(unique_visitors_this_month) - preset_values)
 
+# Räknar ut det månatagliga medelvärdet som styret spenderar i verkstaden
 def monthlyMeanStyret():
     return calcMean(unique_styret_this_month['TOTALTIME'],
                     len(unique_styret_this_month) - preset_values)
 
+# Räknar ut standardavvikelsen för styret månadsvis
 def monthlyStdDevStyret():
     expected_value = monthlyMeanStyret()
     N = len(unique_styret_this_month) - preset_values
     return calcStd(unique_styret_this_month, N, expected_value)
 
+# Standardavvikelsen för alla medlemmar månadsvis
 def monthlyStdDev():
     expected_value = monthlyMean()
     N = len(unique_visitors_this_month) - preset_values
     return calcStd(unique_visitors_this_month, N, expected_value)
 
+# Standardavvikelsen för alla medlemmar dagligen
 def dailyStdDev():
     expected_value = dailyMean()
     N = len(unique_visitors_today) - preset_values
     return calcStd(unique_visitors_today, N, expected_value)
 
+# Resetar listan för unika besökare denna månaden
 def resetMonth():
     global unique_visitors_this_month
     global unique_styret_this_month
@@ -163,6 +183,7 @@ def resetMonth():
     unique_styret_this_month = {'CURRENTMONTH': date.today().strftime('%b'), \
                             'TOTALTIME': timedelta(0)}
 
+# Resetar listan för unika besökare dagligen
 def resetToday():
     global unique_styret_today
     global unique_visitors_today
