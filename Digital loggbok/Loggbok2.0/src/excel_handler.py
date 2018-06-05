@@ -40,6 +40,7 @@ except:
 
 def createNewLoggbook():
     global loggbok
+    global loggSheet
     loggbok = openpyxl.Workbook()
     loggSheet = loggbok.active
     loggSheet['A1'] = 'Datum'
