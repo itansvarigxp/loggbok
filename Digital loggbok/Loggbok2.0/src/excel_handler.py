@@ -36,14 +36,17 @@ try:
     loggbok = openpyxl.load_workbook(paths.xlsx_logg_online)
     loggSheet = loggbok.active
 except:
+    createNewLoggbook()
+
+def createNewLoggbook():
+    global loggbok
     loggbok = openpyxl.Workbook()
-    loggSheet = loggbok.active
+    loggbok = loggbok.active
     loggSheet['A1'] = 'Datum'
     loggSheet['B1'] = 'Namn'
     loggSheet['C1'] = 'Incheckning'
     loggSheet['D1'] = 'Utcheckning'
     loggSheet['E1'] = 'Anmärkning'
-
 
 def exctractYesterdayFromLog():
     yesterday = date.today() - timedelta(1)
@@ -76,25 +79,46 @@ def initMemberRegister():
 
 # Rensar loggbok online från inloggningar som är äldre än days_saved_online
 def cleanEarliestLoggbook():
-    print("Cleaning of loggbook initialized!")
-    print(loggSheet.max_row)
+    old_loggbook = loggbok
+    old_loggSheet = old_loggbook.active
     date_today = datetime.today()
-    idx_removed = 0
-    for row in range(2, loggSheet.max_row):
-        print('A'+str(row))
-        time = loggSheet['A'+str(row)].value
+    createNewLoggbook()
+    index = 2
+    for row in range(2, old_loggSheet.max_row):
+        time = old_loggSheet['A'+str(row)].value
         if time == None or ((date_today - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online):
-            print(time)
-            print(row-idx_removed)
-            print(loggSheet['A'+str(row-idx_removed)].value)
-            loggSheet.delete_rows(row-idx_removed, 1)
-            idx_removed += 1
+            pass
         else:
-            print("not in IF:" + time)
-            print(loggSheet['A'+str(row-idx_removed)].value)
-    print("Cleaning of loggbook done!")
-    print(loggSheet.max_row)
+            i = str(index)
+            loggbok['A' + i] = old_loggSheet['A'+str(row)].value
+            loggbok['B' + i] = old_loggSheet['B'+str(row)].value
+            loggbok['C' + i] = old_loggSheet['C'+str(row)].value
+            loggbok['D' + i] = old_loggSheet['D'+str(row)].value
+            loggbok['E' + i] = old_loggSheet['E'+str(row)].value
+            index += 1
     save()
+
+
+
+    # print("Cleaning of loggbook initialized!")
+    # print(loggSheet.max_row)
+    # date_today = datetime.today()
+    # idx_removed = 0
+    # for row in range(2, loggSheet.max_row):
+    #     print('A'+str(row))
+    #     time = loggSheet['A'+str(row)].value
+    #     if time == None or ((date_today - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online):
+    #         print(time)
+    #         print(row-idx_removed)
+    #         print(loggSheet['A'+str(row-idx_removed)].value)
+    #         loggSheet.delete_rows(row-idx_removed, 1)
+    #         idx_removed += 1
+    #     else:
+    #         print("not in IF:" + time)
+    #         print(loggSheet['A'+str(row-idx_removed)].value)
+    # print("Cleaning of loggbook done!")
+    # print(loggSheet.max_row)
+    # save()
 # Sparar ned loggboken på fil
 def save():
         loggbok.save(paths.xlsx_logg_online)
