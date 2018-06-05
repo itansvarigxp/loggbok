@@ -30,4 +30,4 @@ xlsx_logg_online = log_online_path + file_name_logg_online
 xlsx_member_register = mnt_loggbook_path + file_name_member_register
 xlsx_new_members = mnt_loggbook_path + file_name_new_member_register
 
-xlsx_statistics = stat_path
+xlsx_statistics = mnt_loggbook_path + 'statistik/'
