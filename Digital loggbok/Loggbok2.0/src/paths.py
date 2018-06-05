@@ -13,7 +13,7 @@ stat_path = project_path + "/stat/"
 #log_online_path = project_path + '/log/'
 # Absolute paths for sharing
 log_online_path = '/home/eXPerimentverkstaden/info/'
-mnt_loggbook_path = '/mnt/DigitalLoggbok/'
+mnt_loggbook_path = '/mnt/Digital Loggbok/'
 
 # Absolut mapp
 #webpage_resources_path = '/mnt/www/incheckade/'
