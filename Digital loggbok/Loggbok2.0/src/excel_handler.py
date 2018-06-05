@@ -90,11 +90,11 @@ def cleanEarliestLoggbook():
             pass
         else:
             i = str(index)
-            loggbok['A' + i] = old_loggSheet['A'+str(row)].value
-            loggbok['B' + i] = old_loggSheet['B'+str(row)].value
-            loggbok['C' + i] = old_loggSheet['C'+str(row)].value
-            loggbok['D' + i] = old_loggSheet['D'+str(row)].value
-            loggbok['E' + i] = old_loggSheet['E'+str(row)].value
+            loggSheet['A' + i] = old_loggSheet['A'+str(row)].value
+            loggSheet['B' + i] = old_loggSheet['B'+str(row)].value
+            loggSheet['C' + i] = old_loggSheet['C'+str(row)].value
+            loggSheet['D' + i] = old_loggSheet['D'+str(row)].value
+            loggSheet['E' + i] = old_loggSheet['E'+str(row)].value
             index += 1
     save()
 
