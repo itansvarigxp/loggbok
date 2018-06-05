@@ -86,7 +86,8 @@ def cleanEarliestLoggbook():
             print(time)
             loggSheet.delete_rows(row-idx_removed, 1)
             idx_removed += 1
-        print("not in IF:" + time)
+        else:
+            print("not in IF:" + time)
     print("Cleaning of loggbook done!")
     print(loggSheet.max_row)
     save()
