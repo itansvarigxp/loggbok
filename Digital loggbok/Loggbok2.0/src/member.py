@@ -28,6 +28,7 @@ class Member(object):
     # Checkar in en medlem i klassvariabeln
     def checkIn(member):
         member.setCheckInTime(datetime.now())
+        member.setLatestActivity()
         if (member.board_member):
             Member.checked_in_styret[member.key_card] = member
         else:
