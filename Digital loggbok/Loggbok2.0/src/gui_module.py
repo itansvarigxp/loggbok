@@ -103,7 +103,7 @@ def updateLists(list_of_memberstring, list_tag):
 def message(message_string, message_time=0):
     global latest_message_time
     latest_message_time = datetime.now() + timedelta(0,message_time)
-    if message_string == message_variable:
+    if message_string == message_variable.get():
         return
     else:
         message_variable.set(message_string)

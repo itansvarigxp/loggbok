@@ -88,6 +88,7 @@ def cleanEarliestLoggbook():
             idx_removed += 1
     print("Cleaning of loggbook done!")
     print(loggSheet.max_row)
+    save()
 # Sparar ned loggboken på fil
 def save():
         loggbok.save(paths.xlsx_logg_online)
