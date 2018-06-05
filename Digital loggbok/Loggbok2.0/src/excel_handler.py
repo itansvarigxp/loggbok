@@ -85,10 +85,13 @@ def cleanEarliestLoggbook():
         time = loggSheet['A'+str(row)].value
         if time == None or ((date_today - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online):
             print(time)
+            print(row-idx_removed)
+            print(loggSheet['A'+str(row-idx_removed)].value)
             loggSheet.delete_rows(row-idx_removed, 1)
-            #idx_removed += 1
+            idx_removed += 1
         else:
             print("not in IF:" + time)
+            print(loggSheet['A'+str(row-idx_removed)].value)
     print("Cleaning of loggbook done!")
     print(loggSheet.max_row)
     save()
