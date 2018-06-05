@@ -31,13 +31,6 @@ statistics_categories = OrderedDict([('Datum', StatLogger.yesterday),
                          ('Glömda utcheckningar', StatLogger.forgottenCheckOuts)])
 
 
-# Om det finns en loggbok online så laddas den in, annar skapas en ny.
-try:
-    loggbok = openpyxl.load_workbook(paths.xlsx_logg_online)
-    loggSheet = loggbok.active
-except:
-    createNewLoggbook()
-
 def createNewLoggbook():
     global loggbok
     global loggSheet
@@ -48,6 +41,13 @@ def createNewLoggbook():
     loggSheet['C1'] = 'Incheckning'
     loggSheet['D1'] = 'Utcheckning'
     loggSheet['E1'] = 'Anmärkning'
+
+# Om det finns en loggbok online så laddas den in, annar skapas en ny.
+try:
+    loggbok = openpyxl.load_workbook(paths.xlsx_logg_online)
+    loggSheet = loggbok.active
+except:
+    createNewLoggbook()
 
 def exctractYesterdayFromLog():
     yesterday = date.today() - timedelta(1)

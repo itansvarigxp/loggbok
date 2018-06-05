@@ -46,10 +46,11 @@ input_area_width = message_area_width
 # Mögen nedanför skapar layouten till programet
 root = tk.Tk()
 message_variable = tk.StringVar()
-cv = tk.Canvas(bg='white')
+cv = tk.Canvas(bg='white', highlightthickness=0)
 
 root.title(app_title)
 root.geometry("%dx%d+%d+%d" % (main_window_width, main_window_height, x, y))
+root.configure(background='white')
 in_file = open(paths.gui_bg, "rb")
 data_bytes = in_file.read()
 in_file.close()
