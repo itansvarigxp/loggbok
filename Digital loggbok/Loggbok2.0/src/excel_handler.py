@@ -81,6 +81,7 @@ def cleanEarliestLoggbook():
     date_today = datetime.today()
     idx_removed = 0
     for row in range(2, loggSheet.max_row):
+        print('A'+str(row))
         time = loggSheet['A'+str(row)].value
         if time == None or ((date_today - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online):
             print(time)
