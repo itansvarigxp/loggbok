@@ -41,7 +41,7 @@ except:
 def createNewLoggbook():
     global loggbok
     loggbok = openpyxl.Workbook()
-    loggbok = loggbok.active
+    loggSheet = loggbok.active
     loggSheet['A1'] = 'Datum'
     loggSheet['B1'] = 'Namn'
     loggSheet['C1'] = 'Incheckning'
