@@ -71,6 +71,7 @@ commands = {
     'update' : XlsxHandler.initMemberRegister,
     'save checkedin' : XlsxHandler.saveAllCheckedinToLog,
     'save members' : XlsxHandler.saveMemberlistToFile,
+    'save statistics' : XlsxHandler.saveStatistics,
     'import' : XlsxHandler.importNewMembers,
     'clean' : XlsxHandler.cleanEarliestLoggbook
 }
