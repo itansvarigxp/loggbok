@@ -46,7 +46,7 @@ def timedFunctions():
     # Debugga denna
     if  time_now_str >= ('04:00:00') and \
         time_now_str <= ('05:00:10') and \
-        (XlsxHandler.latest_save + timedelta(hours = 0, minutes = 1) < time_now): 
+        (XlsxHandler.latest_save + timedelta(hours = 2) < time_now): 
         #Mellan 4 och 5 på morgonen rensas loggboken, de som fortfarande är
         #incheckade blir sparade. Nya medlemmar importeras till medlemsregistret
         message_string = "Updating registers, please hold..."
