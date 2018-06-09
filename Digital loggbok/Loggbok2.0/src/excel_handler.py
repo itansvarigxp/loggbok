@@ -170,6 +170,7 @@ def saveMemberlistToFile():
 
 # Sparar alla incheckade som glömde checka ut
 def saveAllCheckedinToLog():
+    global loggSheet
     for key in member.Member.checked_in_members:
         row = str(loggSheet.max_row + 1)
         members = member.Member.checked_in_members[key]
@@ -226,5 +227,6 @@ def saveStatistics():
     if StatLogger.unique_visitors_today['CURRENTDAY'] != current_date:
         StatLogger.resetToday()
     statistics.save('%s%s.xlsx' %(paths.xlsx_statistics, yesterday.strftime('%Y%B')))
+    statistics.close()
 
 

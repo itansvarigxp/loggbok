@@ -1,4 +1,5 @@
 import tkinter as tk
+#from PIL import Image, ImageTk
 from datetime import datetime, timedelta
 import paths
 
@@ -81,6 +82,25 @@ message.pack(side=tk.TOP, expand=False)
 text.pack(side=tk.BOTTOM, expand=False)
 text.focus()
 latest_message_time = datetime.now()
+
+
+# image = Image.open('image.gif')
+# copy_of_image = image.copy()
+# photo = ImageTk.PhotoImage(image)
+# label = ttk.Label(root, image = photo)
+# label.bind('<Configure>', resize_image)
+# label.pack(fill=BOTH, expand = YES)
+
+# def resize_image(event):
+#     new_width = event.width
+#     new_height = event.height
+#     image = copy_of_image.resize((new_width, new_height))
+#     photo = ImageTk.PhotoImage(image)
+#     label.config(image = photo)
+#     label.image = photo #avoid garbage collection
+
+
+
 
 # Uppdaterar de två olika områden där namn skrivs ut, antingen 
 # de med styret eller de med medlemmar

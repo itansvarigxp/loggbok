@@ -61,6 +61,10 @@ def timedFunctions():
         XlsxHandler.save()
         Member.clearCheckedIn()
         XlsxHandler.initMemberRegister()
+        member_str = Member.checkedInMembersToStr(16)
+        styret_str = Member.checkedInStyretToStr(12)
+        GUI.updateLists(styret_str,'styret_names')
+        GUI.updateLists(member_str,'member_names')
         GUI.message("Please swipe your card")
         
 # Kommandon som kan skrivas i programmet för att kalla på motsvarande funktion
