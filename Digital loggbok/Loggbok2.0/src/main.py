@@ -59,6 +59,7 @@ def timedFunctions():
         XlsxHandler.importNewMembers()
         XlsxHandler.saveMemberlistToFile()
         XlsxHandler.save()
+        XlsxHandler.saveAllCheckedinToLog()
         Member.clearCheckedIn()
         XlsxHandler.initMemberRegister()
         member_str = Member.checkedInMembersToStr(16)
