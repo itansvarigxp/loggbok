@@ -86,7 +86,7 @@ def cleanEarliestLoggbook():
     createNewLoggbook()
     global loggSheet
     index = 2
-    for row in range(2, old_loggSheet.max_row):
+    for row in range(2, old_loggSheet.max_row + 1):
         time = old_loggSheet['A'+str(row)].value
         if time == None or ((date_today - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online):
             pass
