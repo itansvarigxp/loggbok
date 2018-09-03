@@ -68,10 +68,11 @@ def initMemberRegister():
         medSheet = medreg[medreg.sheetnames[0]]
         for row in range(2, medSheet.max_row + 1):
             keyCard = medSheet['A' + str(row)].value
+            print(keyCard)
             name =  medSheet['B' + str(row)].value
             board_member = medSheet['C' + str(row)].value == 'Styret'
             latest_activity = medSheet['D' + str(row)].value
-            member.Member(keyCard, name, board_member, )
+            member.Member(keyCard, name, board_member, latest_activity)
     except:
         print("Could not find member register.\n" +
               "Please place the member register in the following folder\n" + 
@@ -82,13 +83,12 @@ def initMemberRegister():
 def cleanEarliestLoggbook():
     old_loggbook = loggbok
     old_loggSheet = old_loggbook.active
-    date_today = datetime.today()
     createNewLoggbook()
     global loggSheet
     index = 2
-    for row in range(2, old_loggSheet.max_row):
+    for row in range(2, old_loggSheet.max_row + 1):
         time = old_loggSheet['A'+str(row)].value
-        if time == None or ((date_today - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online):
+        if time == None or ((datetime.today() - datetime.strptime(time,"%Y-%m-%d")).days > days_saved_online):
             pass
         else:
             i = str(index)
@@ -134,13 +134,13 @@ def importNewMembers():
             member.Member(key_card, name, board_member, latest_activity)
         medreg.close()
     except:
-        pass
+        print('Unable to import new members')
     medreg = openpyxl.Workbook()
     medSheet = medreg.active
     medSheet.title = 'Nya medlemmar'
     medSheet['A1'] = 'Nyckelnr'
     medSheet['B1'] = 'Namn'
-    medSheet['C1'] = 'Styrelsemedlem'
+    medSheet['C1'] = 'Anmärkning'
     medreg.save(paths.xlsx_new_members)
     medreg.close()
     saveMemberlistToFile()
@@ -152,7 +152,7 @@ def saveMemberlistToFile():
     medSheet.title = 'Medlemsregister'
     medSheet['A1'] = '0,Nyckelnr'
     medSheet['B1'] = 'Namn'
-    medSheet['C1'] = 'Styrelsemedlem'
+    medSheet['C1'] = 'Anmärkning'
     medSheet['D1'] = 'Senast aktivitet'
     row = 2
     for key in member.Member.member_register:

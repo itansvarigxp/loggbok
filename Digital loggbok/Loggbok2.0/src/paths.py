@@ -1,5 +1,5 @@
 import os
-
+_debug = True
 # Allt som rör namn på filstrukturer är samlat här
 
 # huvudmapp
@@ -12,9 +12,15 @@ reg_path = project_path + "/reg/"
 stat_path = project_path + "/stat/"
 #log_online_path = project_path + '/log/'
 # Absolute paths for sharing
-log_online_path = '/home/eXPerimentverkstaden/info/'
-mnt_loggbook_path = '/mnt/Digital Loggbok/'
 
+if _debug:
+    log_online_path = project_path + '/debug/'
+    mnt_loggbook_path = log_online_path
+else:
+    log_online_path = '/home/eXPerimentverkstaden/info/'
+    mnt_loggbook_path = '/mnt/Digital Loggbok/'
+
+print(mnt_loggbook_path)
 # Absolut mapp
 #webpage_resources_path = '/mnt/www/incheckade/'
 webpage_resources_path = '/home/eXPerimentverkstaden/incheckade/'
@@ -31,3 +37,4 @@ xlsx_member_register = mnt_loggbook_path + file_name_member_register
 xlsx_new_members = mnt_loggbook_path + file_name_new_member_register
 
 xlsx_statistics = mnt_loggbook_path + 'statistik/'
+

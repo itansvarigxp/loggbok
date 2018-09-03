@@ -56,7 +56,11 @@ in_file = open(paths.gui_bg, "rb")
 data_bytes = in_file.read()
 in_file.close()
 photo = tk.PhotoImage(data=data_bytes)
-cv.configure(width=665, height=660)
+
+if paths._debug:
+	cv.configure(width=665, height=560)
+else:
+	cv.configure(width=665, height=660)
 cv.pack(side=tk.TOP, expand=True)
 cv.create_image(25, 25, image=photo, anchor='nw')
 
