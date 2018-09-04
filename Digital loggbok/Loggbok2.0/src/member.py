@@ -83,11 +83,7 @@ class Member(object):
            list_of_names_tmp.append(member_dict[member].getName())
         nbr_of_elems = len(list_of_names_tmp) // split_at
         for idx in range(0, nbr_of_elems+1):
-            print(idx*split_at)
-            print(((idx+1)*split_at)-1)
             list_of_names.append('\n'.join(list_of_names_tmp[idx*split_at:((idx+1)*split_at)]))
-
-        print(list_of_names)
         return list_of_names
 
     # Gör om incheckade medlemmar till en lista av strings
