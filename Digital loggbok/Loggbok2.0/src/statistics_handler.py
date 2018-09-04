@@ -128,15 +128,18 @@ def calcMean(total_time, N):
 # Funktion för att räkna ut standardavvikelsen över tiden som spenderas i
 # verkstaden
 def calcStdDev(visitor_dict, N, expected_value):
-    accu = 0
-    for unique_members in visitor_dict:
-        if not unique_members in excluded_keys:
-            accu += pow(visitor_dict[unique_members].seconds - expected_value.seconds, 2)
-    try:
-        accu = timedelta(seconds=sqrt(accu / N))
-    except:
-        accu = timedelta(0)
-    return accu
+    if N == 0:
+        return timedelta(0)
+    else:
+        accu = 0
+        for unique_members in visitor_dict:
+            if not unique_members in excluded_keys:
+                accu += pow(visitor_dict[unique_members].seconds - expected_value.seconds, 2)
+        try:
+            accu = timedelta(seconds=sqrt(accu / N))
+        except:
+            accu = timedelta(0)
+        return accu
 
 # Räknar ut det dagliga medelvärdet av antal timmar som varje medlem spenderar
 # i verkstaden

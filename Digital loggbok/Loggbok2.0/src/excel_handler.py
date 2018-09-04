@@ -4,6 +4,7 @@ from string import ascii_uppercase
 import openpyxl
 import member
 import paths
+from os import makedirs, path
 from collections import OrderedDict
 import statistics_handler as StatLogger
 
@@ -206,27 +207,23 @@ def saveStatistics():
     current_date = today.strftime('%m/%d')
     current_month = today.strftime('%b')
     yesterday = date.today() - timedelta(1)
+    stat_file_path = ('%s%s.xlsx' %(paths.xlsx_statistics, yesterday.strftime('%Y%B')))
     try:
-        statistics = openpyxl.load_workbook('%s%s.xlsx' %(paths.xlsx_statistics, yesterday.strftime('%Y%B')))
+        statistics = openpyxl.load_workbook(stat_file_path)
         stat_sheet = statistics.active
     except:
+        if not path.exists(paths.xlsx_statistics):
+            makedirs(paths.xlsx_statistics)
         statistics = openpyxl.Workbook()
         stat_sheet = statistics.active
-        index = 0
-        for ordered_key in statistics_categories:
-            stat_sheet[ascii_sheet[index]+'1'] = ordered_key
-            index += 1
-    row = str(stat_sheet.max_row + 1)
-    index = 0
-    for ordered_key in statistics_categories:
-        stat_sheet[ascii_sheet[index]+row] = statistics_categories[ordered_key]()
-        index += 1
-
+        stat_sheet.append(['%s' % ordered_key for ordered_key in statistics_categories])
+    
+    stat_sheet.append(['%s' % statistics_categories[ordered_key]() for ordered_key in statistics_categories])
     if StatLogger.unique_visitors_this_month['CURRENTMONTH'] != current_month:
         StatLogger.resetMonth()
     if StatLogger.unique_visitors_today['CURRENTDAY'] != current_date:
         StatLogger.resetToday()
-    statistics.save('%s%s.xlsx' %(paths.xlsx_statistics, yesterday.strftime('%Y%B')))
+    statistics.save(stat_file_path)
     statistics.close()
 
 
