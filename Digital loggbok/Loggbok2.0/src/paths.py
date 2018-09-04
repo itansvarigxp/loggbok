@@ -1,5 +1,5 @@
 import os
-_debug = False
+_debug = True
 # Allt som rör namn på filstrukturer är samlat här
 
 # huvudmapp
