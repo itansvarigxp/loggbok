@@ -60,8 +60,10 @@ def timedFunctions():
         XlsxHandler.saveAllCheckedinToLog()
         Member.clearCheckedIn()
         XlsxHandler.initMemberRegister()
-        GUI.updateNames(Member.checked_in_members, 'member')
-        GUI.updateNames(Member.checked_in_styret, 'styret')
+        member_str = Member.checkedInMembersToStr(16)
+        styret_str = Member.checkedInStyretToStr(12)
+        GUI.updateLists(styret_str,'styret_names')
+        GUI.updateLists(member_str,'member_names')
         GUI.message("Please swipe your card")
         
 # Kommandon som kan skrivas i programmet för att kalla på motsvarande funktion
@@ -84,10 +86,10 @@ XlsxHandler.initMemberRegister()
 while True:
     # Gör om klassvariablerna i Members till en lista av strings med namm
     # samt uppdaterar GUI-modulen som hanterar de olika listorna.
-
-    GUI.updateNames(Member.checked_in_members, 'member')
-    GUI.updateNames(Member.checked_in_styret, 'styret')
-    
+    member_str = Member.checkedInMembersToStr(16)
+    styret_str = Member.checkedInStyretToStr(12)
+    GUI.updateLists(styret_str,'styret_names')
+    GUI.updateLists(member_str,'member_names')
     # Flagga för att förhindra för många functioncalls i whileloopen nedan.
     flag = True
     # Flytta bilder för hemsidan
@@ -137,10 +139,12 @@ while True:
             # styret
             if (member_local.getBoardmember()):
                 StatLogger.tickCheckInsStyret()
-                GUI.updateNames(Member.checked_in_styret, 'styret')
+                GUI.updateLists(Member.toListStr(Member.checked_in_styret, 12), 
+                                'styret_names')
             else:
                 StatLogger.tickCheckInsMember()
-                GUI.updateNames(Member.checked_in_members, 'member')
+                GUI.updateLists(Member.toListStr(Member.checked_in_members, 16), 
+                                'member_names')
         # Om kortnumret inte finns sparat i medlemsdatabasen, initiera bytesprocessen
         else:
             old_card_number = card_number
