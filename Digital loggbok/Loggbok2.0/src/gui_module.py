@@ -108,22 +108,34 @@ latest_message_time = datetime.now()
 
 # Uppdaterar de två olika områden där namn skrivs ut, antingen 
 # de med styret eller de med medlemmar
-def updateLists(list_of_memberstring, list_tag):
+
+member_namelist_rows = 14
+styret_namelist_rows = 10
+namelist_colspacing = 300
+namelist_rowspacing = 20
+
+def updateNames(list_of_members, list_tag):
     cv.delete(list_tag)
-    next_col = 300
-    idx = 0
-    if list_tag == 'styret_names':
+    item_nbr = 0
+
+    if list_tag == 'styret':
         namelist_offsetX = styret_namelist_offsetX
         namelist_offsetY = styret_namelist_offsetY
+        items_per_row = styret_namelist_rows
     else:
         namelist_offsetX = member_namelist_offsetX
         namelist_offsetY = member_namelist_offsetY
-    for items in list_of_memberstring:
-        cv.create_text(namelist_offsetX + next_col * idx, namelist_offsetY,
+        items_per_row = member_namelist_rows
+    
+    for member in list_of_members:
+        name = list_of_members[member].getName()
+        cv.create_text(namelist_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
+                       namelist_offsetY + (item_nbr % items_per_row) * namelist_rowspacing,
                         fill=namelist_color, font=namelist_font, anchor='nw', 
-                        text=items, tag=list_tag)
-        idx = idx + 1
+                        text=name, tag=list_tag)
+        item_nbr += 1
     root.update()
+
 
 def message(message_string, message_time=0):
     global latest_message_time

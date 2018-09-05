@@ -73,19 +73,6 @@ class Member(object):
         Member.checked_in_members = {}
         Member.checked_in_styret = {}
 
-    # Gör om en lång lista av incheckade namn till en lista av strings
-    # med incheckade namn. Splittar listan efter split_at rader.
-    # Returnerar en lista av strings med split at antal rader
-    def toListStr(member_dict, split_at):
-        list_of_names_tmp = []
-        list_of_names = []
-        for member in member_dict:
-           list_of_names_tmp.append(member_dict[member].getName())
-        nbr_of_elems = len(list_of_names_tmp) // split_at
-        for idx in range(0, nbr_of_elems+1):
-            list_of_names.append('\n'.join(list_of_names_tmp[idx*split_at:((idx+1)*split_at)]))
-        return list_of_names
-
     # Gör om incheckade medlemmar till en lista av strings
     def checkedInMembersToStr(split_at):
         return Member.toListStr(Member.checked_in_members, split_at-1)
