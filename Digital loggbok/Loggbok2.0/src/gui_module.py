@@ -19,6 +19,7 @@ title_size = 28
 namelist_size = 14
 title_font = ('Arial', title_size, 'bold')
 namelist_font=('Arial', namelist_size)
+permanent_message_font = ('Arial', 22, 'bold') 
 
 # Variabler för offset de olika objekten i vyn
 member_title_offsetX = 5
@@ -31,7 +32,7 @@ x = 10
 y = 10
 namelist_row_padding = 5
 namelist_col_padding = 10
-interactive_area_height = 80
+interactive_area_height = 40
 message_area_height = 65
 input_area_height = 15
 styret_namelist_offsetX = namelist_col_padding
@@ -58,7 +59,7 @@ in_file.close()
 photo = tk.PhotoImage(data=data_bytes)
 
 if paths._debug:
-	cv.configure(width=665, height=560)
+	cv.configure(width=665, height=600)
 else:
 	cv.configure(width=665, height=660)
 cv.pack(side=tk.TOP, expand=True)
@@ -74,13 +75,18 @@ message_area = tk.Frame(cv, bg=message_area_bg_color,
                         width=message_area_width, height=message_area_height, bd = 0)
 message = tk.Message(message_area, bg=message_area_bg_color, width=500, 
                      fg=message_area_fg_color, textvariable=message_variable)
-text = tk.Text(interactive_area, height=input_area_height, width=input_area_width,
+text = tk.Text(interactive_area, height=input_area_height, width=input_area_width, font=permanent_message_font,
                bg=input_area_bg_color, foreground=input_area_fg_color, bd = 0)
+
+text.tag_configure("center", justify='center')
+text.insert(tk.INSERT, "Please scan your card\n")
+text.tag_add("center", "1.0", "end")
+
 
 interactive_area.pack(side=tk.BOTTOM, expand=False)
 #message_area.pack(side=tk.TOP, expand = False)
 message_area.pack_propagate(False)
-message_variable.set("Please swipe your card")
+#message_variable.set("Please swipe your card")
 message.configure(font=('Arial', 14, 'bold'))
 #message.pack(side=tk.TOP, expand=False)
 message.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
@@ -146,25 +152,25 @@ def updateNames(list_of_members, list_tag):
 def message(message_string, message_time=0):
     global latest_message_time
     latest_message_time = datetime.now() + timedelta(0,message_time)
-    showMessage()
     if message_string == message_variable.get():
         return
     else:
+        showMessage()
         message_variable.set(message_string)
 
 # Kollar om det finns en ny rad i input-text rutan
 def hasLines():
-    input_text = text.get('1.0',tk.END+"-1c")
+    input_text = text.get('2.0',tk.END+"-1c")
     root.update()
     return sum(1 for char in input_text if char == '\n')
 
 # Tar bort alla rader i input text rutan
 def removeInput():
-    text.delete('1.0', tk.END)
+    text.delete('2.0', tk.END+"-1c")
 
 # Returnerar det som står i textrutan och renar den
 def readInput():
-    txt = text.get('1.0',tk.END+"-1c")[:-1]
+    txt = text.get('2.0',tk.END+"-1c")[:-1]
     removeInput()
     return txt
     

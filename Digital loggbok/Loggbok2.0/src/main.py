@@ -62,7 +62,6 @@ def timedFunctions():
         XlsxHandler.initMemberRegister()
         GUI.updateNames(Member.checked_in_members, 'member')
         GUI.updateNames(Member.checked_in_styret, 'styret')
-        GUI.message("Please swipe your card")
         
 # Kommandon som kan skrivas i programmet för att kalla på motsvarande funktion
 commands = {
