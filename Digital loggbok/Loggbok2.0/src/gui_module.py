@@ -40,7 +40,7 @@ member_namelist_offsetX = namelist_col_padding
 member_namelist_offsetY = member_title_offsetY + namelist_row_padding + title_size
 interactive_area_width = main_window_width
 message_height = message_area_height - input_area_height
-message_area_width = main_window_width
+message_area_width = main_window_width//2
 message_width = message_area_width
 input_area_width = message_area_width
 
@@ -70,7 +70,7 @@ cv.create_text(styret_title_offsetX, styret_title_offsetY, fill=title_color,
                font=title_font, anchor='nw', text=styret_title)
 interactive_area = tk.Frame(root, bg=message_area_bg_color,width=interactive_area_width,
                             height=interactive_area_height)
-message_area = tk.Frame(interactive_area, bg=message_area_bg_color,
+message_area = tk.Frame(cv, bg=message_area_bg_color,
                         width=message_area_width, height=message_area_height, bd = 0)
 message = tk.Message(message_area, bg=message_area_bg_color, width=500, 
                      fg=message_area_fg_color, textvariable=message_variable)
@@ -78,15 +78,22 @@ text = tk.Text(interactive_area, height=input_area_height, width=input_area_widt
                bg=input_area_bg_color, foreground=input_area_fg_color, bd = 0)
 
 interactive_area.pack(side=tk.BOTTOM, expand=False)
-message_area.pack(side=tk.TOP, expand = False)
+#message_area.pack(side=tk.TOP, expand = False)
 message_area.pack_propagate(False)
+message_area.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 message_variable.set("Please swipe your card")
 message.configure(font=('Arial', 14, 'bold'))
-message.pack(side=tk.TOP, expand=False)
+#message.pack(side=tk.TOP, expand=False)
+message.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 text.pack(side=tk.BOTTOM, expand=False)
 text.focus()
 latest_message_time = datetime.now()
 
+def hideMessage():
+    message_area.place_forget()
+
+def showMessage():
+    message_area.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
 # image = Image.open('image.gif')
 # copy_of_image = image.copy()
@@ -140,11 +147,11 @@ def updateNames(list_of_members, list_tag):
 def message(message_string, message_time=0):
     global latest_message_time
     latest_message_time = datetime.now() + timedelta(0,message_time)
+    showMessage()
     if message_string == message_variable.get():
         return
     else:
         message_variable.set(message_string)
-        root.update()
 
 # Kollar om det finns en ny rad i input-text rutan
 def hasLines():

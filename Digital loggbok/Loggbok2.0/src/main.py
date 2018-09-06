@@ -97,7 +97,8 @@ while True:
         timedFunctions()
         date_time_now = datetime.now()
         if (flag and (GUI.latest_message_time < date_time_now)):
-            GUI.message("Please swipe your card")
+            GUI.hideMessage()
+            #GUI.message("Please swipe your card")
             flag = False
 
     # Nytt input har tillkommit
