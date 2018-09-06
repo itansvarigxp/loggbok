@@ -80,7 +80,6 @@ text = tk.Text(interactive_area, height=input_area_height, width=input_area_widt
 interactive_area.pack(side=tk.BOTTOM, expand=False)
 #message_area.pack(side=tk.TOP, expand = False)
 message_area.pack_propagate(False)
-message_area.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 message_variable.set("Please swipe your card")
 message.configure(font=('Arial', 14, 'bold'))
 #message.pack(side=tk.TOP, expand=False)
