@@ -76,29 +76,29 @@ def totalTimeMonthStyret():
 def checkOutStat(member):
     key_card = member.getKeyCardNumber()
     time_in_workshop = datetime.now() - member.getCheckInTimeObject()
+    if time_in_workshop > datetime.timedelta(minutes = 5)
+        if member.getBoardmember():
+            if key_card in unique_styret_today: 
+                unique_styret_today[key_card] += time_in_workshop
+            else:
+                unique_styret_today[key_card] = time_in_workshop
+            if key_card in unique_styret_this_month:
+                unique_styret_this_month[key_card] += time_in_workshop
+            else:
+                unique_styret_this_month[key_card] = time_in_workshop
+            unique_styret_this_month['TOTALTIME'] += time_in_workshop
+            unique_styret_today['TOTALTIME'] += time_in_workshop
 
-    if member.getBoardmember():
-        if key_card in unique_styret_today: 
-            unique_styret_today[key_card] += time_in_workshop
+        if key_card in unique_visitors_today:
+            unique_visitors_today[key_card] += time_in_workshop
         else:
-            unique_styret_today[key_card] = time_in_workshop
-        if key_card in unique_styret_this_month:
-            unique_styret_this_month[key_card] += time_in_workshop
+            unique_visitors_today[key_card] = time_in_workshop
+        if key_card in unique_visitors_this_month:
+            unique_visitors_this_month[key_card] += time_in_workshop
         else:
-            unique_styret_this_month[key_card] = time_in_workshop
-        unique_styret_this_month['TOTALTIME'] += time_in_workshop
-        unique_styret_today['TOTALTIME'] += time_in_workshop
-
-    if key_card in unique_visitors_today:
-        unique_visitors_today[key_card] += time_in_workshop
-    else:
-        unique_visitors_today[key_card] = time_in_workshop
-    if key_card in unique_visitors_this_month:
-        unique_visitors_this_month[key_card] += time_in_workshop
-    else:
-        unique_visitors_this_month[key_card] = time_in_workshop
-    unique_visitors_this_month['TOTALTIME'] += time_in_workshop
-    unique_visitors_today['TOTALTIME'] += time_in_workshop
+            unique_visitors_this_month[key_card] = time_in_workshop
+        unique_visitors_this_month['TOTALTIME'] += time_in_workshop
+        unique_visitors_today['TOTALTIME'] += time_in_workshop
 
 # Om en medlem måste föra över information till ett nytt kort så kopplas
 # medelmmens gamla data till det nya kortet
