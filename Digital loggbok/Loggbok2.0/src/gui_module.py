@@ -6,7 +6,7 @@ import paths
 # Variabler för namn, font, storlek och så vidare i vyn
 styret_namelist = ""
 member_namelist = ""
-app_title = "XP digital logg v2.0"
+app_title = "XP digital logg v2.1"
 member_title = "Checked-in members"
 styret_title = "Checked-in board members"
 message_area_bg_color = 'black'
