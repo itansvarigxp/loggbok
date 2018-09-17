@@ -76,7 +76,7 @@ def totalTimeMonthStyret():
 def checkOutStat(member):
     key_card = member.getKeyCardNumber()
     time_in_workshop = datetime.now() - member.getCheckInTimeObject()
-    if time_in_workshop > datetime.timedelta(minutes = 5)
+    if time_in_workshop > datetime.timedelta(minutes = 5):
         if member.getBoardmember():
             if key_card in unique_styret_today: 
                 unique_styret_today[key_card] += time_in_workshop
@@ -141,11 +141,20 @@ def calcStdDev(visitor_dict, N, expected_value):
             accu = timedelta(0)
         return accu
 
+def strfdelta(tdelta):
+    hours, remainder = divmod(tdelta.seconds, 3600)
+    hours += tdelta.days*24
+    minutes, seconds = divmod(remainder, 60)
+    return '%s:%s:%s' % (hours, minutes, seconds)
+
 # Räknar ut det dagliga medelvärdet av antal timmar som varje medlem spenderar
 # i verkstaden
 def dailyMean():
     return calcMean(unique_visitors_today['TOTALTIME'],
                     len(unique_visitors_today) - preset_values)
+
+def dailyMeanStrf():
+    return strfdelta(dailyMean())
 
 # Räknar ut det månatagliga medelvärdet av antal timmar som varje medlem spenderar
 # i verkstaden
@@ -153,28 +162,34 @@ def monthlyMean():
     return calcMean(unique_visitors_this_month['TOTALTIME'],
                     len(unique_visitors_this_month) - preset_values)
 
+def monthlyMeanStrf():
+    return strfdelta(monthlyMean())
+
 # Räknar ut det månatagliga medelvärdet som styret spenderar i verkstaden
 def monthlyMeanStyret():
     return calcMean(unique_styret_this_month['TOTALTIME'],
                     len(unique_styret_this_month) - preset_values)
 
+def monthlyMeanStyretStrf():
+    return strfdelta(monthlyMeanStyret)
+
 # Räknar ut standardavvikelsen för styret månadsvis
 def monthlyStdDevStyret():
     expected_value = monthlyMeanStyret()
     N = len(unique_styret_this_month) - preset_values
-    return calcStdDev(unique_styret_this_month, N, expected_value)
+    return strfdelta(calcStdDev(unique_styret_this_month, N, expected_value))
 
 # Standardavvikelsen för alla medlemmar månadsvis
 def monthlyStdDev():
     expected_value = monthlyMean()
     N = len(unique_visitors_this_month) - preset_values
-    return calcStdDev(unique_visitors_this_month, N, expected_value)
+    return strfdelta(calcStdDev(unique_visitors_this_month, N, expected_value))
 
 # Standardavvikelsen för alla medlemmar dagligen
 def dailyStdDev():
     expected_value = dailyMean()
     N = len(unique_visitors_today) - preset_values
-    return calcStdDev(unique_visitors_today, N, expected_value)
+    return strfdelta(calcStdDev(unique_visitors_today, N, expected_value))
 
 # Resetar listan för unika besökare denna månaden
 def resetMonth():
