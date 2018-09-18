@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
 from datetime import datetime, timedelta
+from member import Member
 import paths
 
 # Variabler för namn, font, storlek och så vidare i vyn
@@ -24,7 +25,7 @@ permanent_message_font = ('Arial', 22, 'bold')
 
 # Variabler för offset de olika objekten i vyn
 member_title_offsetX = 5
-member_title_offsetY = 250
+member_title_offsetY = 200
 styret_title_offsetX = member_title_offsetX
 styret_title_offsetY = 0
 main_window_width = 700
@@ -33,7 +34,7 @@ x = 10
 y = 10
 namelist_row_padding = 5
 namelist_col_padding = 10
-interactive_area_height = 40
+interactive_area_height = 70
 
 message_area_height = 100
 message_area_width = 600
@@ -70,6 +71,8 @@ else:
 
 def resize_image(event):
     new_size = min(event.width, event.height)
+    global member_namelist_offsetY
+    member_namelist_offsetY = max(0,event.height-member_title_offsetY) + namelist_row_padding + title_size
     image = copy_of_image.resize((new_size-50, new_size-50))
     photo = ImageTk.PhotoImage(image)
     cv.delete("all")
@@ -78,14 +81,21 @@ def resize_image(event):
                font=title_font, anchor='nw', text=member_title)
     cv.create_text(styret_title_offsetX, styret_title_offsetY, fill=title_color,
                font=title_font, anchor='nw', text=styret_title)
+    updateNames(Member.checked_in_members, 'member')
+    updateNames(Member.checked_in_styret, 'styret')
     cv.image = photo #avoid garbage collection
     cv.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
 
+def replace_areas(event):
+    #print(root.winfo_width())
+    #print(root.winfo_height())
+    cv.configure(width=root.winfo_width(), height=root.winfo_height()-interactive_area_height)
 
 image = Image.open(paths.gui_bg)
 copy_of_image = image.copy()
 photo = ImageTk.PhotoImage(image)
 #cv = ttk.Label(root, image = photo)
+root.bind('<Configure>', replace_areas)
 cv.bind('<Configure>', resize_image)
 cv.create_image(25, 25, image=photo, anchor='nw', tag='background')
 cv.pack(side=tk.TOP, expand=True)
@@ -147,7 +157,7 @@ def showMessage():
 # Uppdaterar de två olika områden där namn skrivs ut, antingen 
 # de med styret eller de med medlemmar
 
-member_namelist_rows = 14
+member_namelist_rows = 8
 styret_namelist_rows = 10
 namelist_colspacing = 300
 namelist_rowspacing = 20
