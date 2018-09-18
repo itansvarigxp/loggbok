@@ -76,7 +76,7 @@ def totalTimeMonthStyret():
 def checkOutStat(member):
     key_card = member.getKeyCardNumber()
     time_in_workshop = datetime.now() - member.getCheckInTimeObject()
-    if time_in_workshop > datetime.timedelta(minutes = 5):
+    if time_in_workshop > timedelta(minutes = 5):
         if member.getBoardmember():
             if key_card in unique_styret_today: 
                 unique_styret_today[key_card] += time_in_workshop

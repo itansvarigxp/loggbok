@@ -1,5 +1,6 @@
 import tkinter as tk
-#from PIL import Image, ImageTk
+from tkinter import ttk
+from PIL import Image, ImageTk
 from datetime import datetime, timedelta
 import paths
 
@@ -33,7 +34,10 @@ y = 10
 namelist_row_padding = 5
 namelist_col_padding = 10
 interactive_area_height = 40
-message_area_height = 65
+
+message_area_height = 100
+message_area_width = 600
+
 input_area_height = 15
 styret_namelist_offsetX = namelist_col_padding
 styret_namelist_offsetY = styret_title_offsetY + namelist_row_padding + title_size
@@ -41,7 +45,6 @@ member_namelist_offsetX = namelist_col_padding
 member_namelist_offsetY = member_title_offsetY + namelist_row_padding + title_size
 interactive_area_width = main_window_width
 message_height = message_area_height - input_area_height
-message_area_width = main_window_width//2
 message_width = message_area_width
 input_area_width = message_area_width
 
@@ -62,8 +65,31 @@ if paths._debug:
 	cv.configure(width=665, height=600)
 else:
 	cv.configure(width=665, height=660)
+
+#cv.create_image(25, 25, image=photo, anchor='nw')
+
+def resize_image(event):
+    new_size = min(event.width, event.height)
+    image = copy_of_image.resize((new_size-50, new_size-50))
+    photo = ImageTk.PhotoImage(image)
+    cv.delete("all")
+    cv.create_image(event.width/2, event.height/2, image=photo, anchor='center', tag='background')
+    cv.create_text(member_title_offsetX, max(0,event.height-member_title_offsetY), fill=title_color,
+               font=title_font, anchor='nw', text=member_title)
+    cv.create_text(styret_title_offsetX, styret_title_offsetY, fill=title_color,
+               font=title_font, anchor='nw', text=styret_title)
+    cv.image = photo #avoid garbage collection
+    cv.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
+
+
+image = Image.open(paths.gui_bg)
+copy_of_image = image.copy()
+photo = ImageTk.PhotoImage(image)
+#cv = ttk.Label(root, image = photo)
+cv.bind('<Configure>', resize_image)
+cv.create_image(25, 25, image=photo, anchor='nw', tag='background')
 cv.pack(side=tk.TOP, expand=True)
-cv.create_image(25, 25, image=photo, anchor='nw')
+
 
 cv.create_text(member_title_offsetX, member_title_offsetY, fill=title_color,
                font=title_font, anchor='nw', text=member_title)
