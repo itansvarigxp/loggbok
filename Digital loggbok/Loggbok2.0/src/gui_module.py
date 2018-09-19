@@ -169,11 +169,11 @@ def updateNames(list_of_members, list_tag):
     if list_tag == 'styret':
         namelist_offsetX = styret_namelist_offsetX
         namelist_offsetY = styret_namelist_offsetY
-        items_per_row = styret_namelist_rows
+        items_per_row = (member_namelist_offsetY - styret_namelist_offsetY - 2*namelist_rowspacing) // namelist_rowspacing
     else:
         namelist_offsetX = member_namelist_offsetX
         namelist_offsetY = member_namelist_offsetY
-        items_per_row = member_namelist_rows
+        items_per_row = (cv.winfo_height() - member_namelist_offsetY ) // namelist_rowspacing
     
     for member in list_of_members:
         name = list_of_members[member].getName()
