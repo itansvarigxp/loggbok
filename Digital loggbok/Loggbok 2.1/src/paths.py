@@ -20,7 +20,6 @@ else:
     log_online_path = '/home/eXPerimentverkstaden/info/'
     mnt_loggbook_path = '/mnt/Digital Loggbok/'
 
-print(mnt_loggbook_path)
 # Absolut mapp
 #webpage_resources_path = '/mnt/www/incheckade/'
 webpage_resources_path = '/home/eXPerimentverkstaden/incheckade/'

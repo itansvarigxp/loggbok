@@ -69,7 +69,6 @@ def initMemberRegister():
         medSheet = medreg[medreg.sheetnames[0]]
         for row in range(2, medSheet.max_row + 1):
             keyCard = medSheet['A' + str(row)].value
-            print(keyCard)
             name =  medSheet['B' + str(row)].value
             board_member = medSheet['C' + str(row)].value == 'Styret'
             latest_activity = medSheet['D' + str(row)].value
