@@ -59,18 +59,29 @@ def forgottenCheckOuts():
 def totalTimeToday():
     return unique_visitors_today['TOTALTIME']
 
+def totalTimeTodayStrf():
+    return strfdelta(totalTimeToday())
 # Returnerar total antal tid som styret spenderat i verkstaden idag
 def totalTimeTodayStyret():
     return unique_styret_today['TOTALTIME']
+
+def totalTimeTodayStyretStrf():
+    return strfdelta(totalTimeTodayStyret())
 
 # Returnerar total antal tid som spenderats i verkstaden hittills denna månad
 def totalTimeMonth():
     return unique_visitors_this_month['TOTALTIME']
 
+def totalTimeMonthStrf():
+    return strfdelta(totalTimeMonth())
+
 # Returnerar total antal tid som spenderats i verkstaden av styret hittills
 # denna månad
 def totalTimeMonthStyret():
     return unique_styret_this_month['TOTALTIME']
+
+def totalTimeMonthStyretStrf():
+    return strfdelta(totalTimeMonthStyret())
 
 # När en medlem checkar ut så uppdateras alla variabler relaterade till timetracking
 def checkOutStat(member):
@@ -122,7 +133,7 @@ def calcMean(total_time, N):
     try:
         mean = total_time / N
     except:
-        mean = 0
+        mean = timedelta(0)
     return mean
 
 # Funktion för att räkna ut standardavvikelsen över tiden som spenderas i
@@ -145,7 +156,7 @@ def strfdelta(tdelta):
     hours, remainder = divmod(tdelta.seconds, 3600)
     hours += tdelta.days*24
     minutes, seconds = divmod(remainder, 60)
-    return '%s:%s:%s' % (hours, minutes, seconds)
+    return '%s:%02d:%02d' % (hours, minutes, seconds)
 
 # Räknar ut det dagliga medelvärdet av antal timmar som varje medlem spenderar
 # i verkstaden
@@ -171,7 +182,7 @@ def monthlyMeanStyret():
                     len(unique_styret_this_month) - preset_values)
 
 def monthlyMeanStyretStrf():
-    return strfdelta(monthlyMeanStyret)
+    return strfdelta(monthlyMeanStyret())
 
 # Räknar ut standardavvikelsen för styret månadsvis
 def monthlyStdDevStyret():
