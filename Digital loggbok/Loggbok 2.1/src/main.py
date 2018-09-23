@@ -78,6 +78,7 @@ commands = {
 
 
 # Initierar excelfiler
+XlsxHandler.initBoardMemberRegister()
 XlsxHandler.initMemberRegister()
 
 while True:

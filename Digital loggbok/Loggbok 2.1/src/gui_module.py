@@ -8,7 +8,7 @@ import paths
 # Variabler för namn, font, storlek och så vidare i vyn
 styret_namelist = ""
 member_namelist = ""
-app_title = "XP digital logg v2.1"
+app_title = "XP digital logg v3.0"
 member_title = "Checked-in members"
 styret_title = "Checked-in board members"
 message_area_bg_color = 'black'
@@ -40,6 +40,10 @@ message_area_height = 100
 message_area_width = 600
 
 input_area_height = 15
+
+namelist_colspacing = 300
+namelist_rowspacing = 20
+
 styret_namelist_offsetX = namelist_col_padding
 styret_namelist_offsetY = styret_title_offsetY + namelist_row_padding + title_size
 member_namelist_offsetX = namelist_col_padding
@@ -136,31 +140,8 @@ def hideMessage():
 def showMessage():
     message_area.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-# image = Image.open('image.gif')
-# copy_of_image = image.copy()
-# photo = ImageTk.PhotoImage(image)
-# label = ttk.Label(root, image = photo)
-# label.bind('<Configure>', resize_image)
-# label.pack(fill=BOTH, expand = YES)
-
-# def resize_image(event):
-#     new_width = event.width
-#     new_height = event.height
-#     image = copy_of_image.resize((new_width, new_height))
-#     photo = ImageTk.PhotoImage(image)
-#     label.config(image = photo)
-#     label.image = photo #avoid garbage collection
-
-
-
-
 # Uppdaterar de två olika områden där namn skrivs ut, antingen 
 # de med styret eller de med medlemmar
-
-member_namelist_rows = 8
-styret_namelist_rows = 10
-namelist_colspacing = 300
-namelist_rowspacing = 20
 
 def updateNames(list_of_members, list_tag):
     cv.delete(list_tag)
@@ -170,18 +151,28 @@ def updateNames(list_of_members, list_tag):
         namelist_offsetX = styret_namelist_offsetX
         namelist_offsetY = styret_namelist_offsetY
         items_per_row = (member_namelist_offsetY - styret_namelist_offsetY - 2*namelist_rowspacing) // namelist_rowspacing
+
+        for member in list_of_members:
+            board_member = list_of_members[member]
+            name = board_member.getName()
+            title =  board_member.getTitle()
+            cv.create_text(namelist_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
+                           namelist_offsetY + (item_nbr % items_per_row) * namelist_rowspacing,
+                            fill=namelist_color, font=namelist_font, anchor='nw', 
+                            text=name, tag=list_tag)
+            item_nbr += 1
     else:
         namelist_offsetX = member_namelist_offsetX
         namelist_offsetY = member_namelist_offsetY
         items_per_row = (cv.winfo_height() - member_namelist_offsetY ) // namelist_rowspacing
     
-    for member in list_of_members:
-        name = list_of_members[member].getName()
-        cv.create_text(namelist_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
-                       namelist_offsetY + (item_nbr % items_per_row) * namelist_rowspacing,
-                        fill=namelist_color, font=namelist_font, anchor='nw', 
-                        text=name, tag=list_tag)
-        item_nbr += 1
+        for member in list_of_members:
+            name = list_of_members[member].getName()
+            cv.create_text(namelist_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
+                           namelist_offsetY + (item_nbr % items_per_row) * namelist_rowspacing,
+                            fill=namelist_color, font=namelist_font, anchor='nw', 
+                            text=name, tag=list_tag)
+            item_nbr += 1
     root.update()
 
 

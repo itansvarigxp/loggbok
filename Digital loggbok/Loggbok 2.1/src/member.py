@@ -12,10 +12,11 @@ class Member(object):
     member_register = {}
 
     # Konstruktor
-    def __init__(self, key_card, name, board_member = False, latest_activity = None):
+    def __init__(self, key_card, name, board_member = False, title = "", latest_activity = None):
         self.key_card = key_card
         self.name = name
         self.board_member = board_member
+        self.title = title
         self.checkin_time = None
         self.latest_activity = latest_activity
         Member.member_register[key_card] = self
@@ -41,6 +42,9 @@ class Member(object):
     # Returnerar om objektet är en styrelsemedlem eller ej
     def getBoardmember(self):
         return self.board_member
+
+    def getTitle(self):
+        return self.title
 
     # Returnerar tiden som objektet checkade in
     def getCheckedInTime(self):
