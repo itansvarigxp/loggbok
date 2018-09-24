@@ -69,11 +69,15 @@ def initBoardMemberRegister():
         styret_register = openpyxl.load_workbook(paths.xlsx_styret_register)
         styret_register_sheet = styret_register.active
         for row in range(2, styret_register_sheet.max_row + 1):
-            styret_titles[styret_register_sheet['A' + str(row)]] = styret_register_sheet['B' + str(row)]
+            styret_titles[styret_register_sheet['A' + str(row)].value] = styret_register_sheet['B' + str(row)].value
     except:
-        print ("Could not initialize board member register. \n" +
-               "Please place the board member register in the following folder:\n" +
-               paths.xlsx_styret_register)
+        styret_register = openpyxl.Workbook()
+        styret_register_sheet = styret_register.active
+        styret_register_sheet.title = 'Styrelseposter'
+        styret_register_sheet['A1'] = 'Namn'
+        styret_register_sheet['B1'] = 'Styrelsepost'
+        styret_register.save(paths.xlsx_styret_register)
+        styret_register.close()
 
 
 
@@ -87,12 +91,8 @@ def initMemberRegister():
             keyCard = medSheet['A' + str(row)].value
             name =  medSheet['B' + str(row)].value
             board_member = medSheet['C' + str(row)].value == 'Styret'
-            if board_member and name in styret_titles:
-                title = styret_titles[name]
-            else:
-                title = ""
             latest_activity = medSheet['D' + str(row)].value
-            member.Member(keyCard, name, board_member, title, latest_activity)
+            member.Member(keyCard, name, board_member, latest_activity)
     except:
         print("Could not find member register.\n" +
               "Please place the member register in the following folder:\n" + 

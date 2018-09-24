@@ -59,6 +59,7 @@ def timedFunctions():
         XlsxHandler.importNewMembers()
         XlsxHandler.saveAllCheckedinToLog()
         Member.clearCheckedIn()
+        XlsxHandler.initBoardMemberRegister()
         XlsxHandler.initMemberRegister()
         GUI.updateNames(Member.checked_in_members, 'member')
         GUI.updateNames(Member.checked_in_styret, 'styret')

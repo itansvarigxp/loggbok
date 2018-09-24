@@ -3,6 +3,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 from datetime import datetime, timedelta
 from member import Member
+from excel_handler import styret_titles
 import paths
 
 # Variabler för namn, font, storlek och så vidare i vyn
@@ -150,16 +151,26 @@ def updateNames(list_of_members, list_tag):
     if list_tag == 'styret':
         namelist_offsetX = styret_namelist_offsetX
         namelist_offsetY = styret_namelist_offsetY
+        title_offsetY = namelist_offsetY + 20
         items_per_row = (member_namelist_offsetY - styret_namelist_offsetY - 2*namelist_rowspacing) // namelist_rowspacing
 
         for member in list_of_members:
             board_member = list_of_members[member]
             name = board_member.getName()
-            title =  board_member.getTitle()
+            if name in styret_titles:
+                title = styret_titles[name]
+            else:
+                title = ""
+
+            styret_rowspacing = namelist_rowspacing*2
             cv.create_text(namelist_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
-                           namelist_offsetY + (item_nbr % items_per_row) * namelist_rowspacing,
+                           namelist_offsetY + (item_nbr % items_per_row) * styret_rowspacing,
                             fill=namelist_color, font=namelist_font, anchor='nw', 
                             text=name, tag=list_tag)
+            cv.create_text(namelist_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
+                           title_offsetY + (item_nbr % items_per_row) * styret_rowspacing,
+                            fill=namelist_color, font=namelist_font, anchor='nw', 
+                            text=title, tag=list_tag)
             item_nbr += 1
     else:
         namelist_offsetX = member_namelist_offsetX
