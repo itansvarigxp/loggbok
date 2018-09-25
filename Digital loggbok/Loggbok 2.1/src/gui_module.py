@@ -72,6 +72,7 @@ if paths._debug:
 else:
 	cv.configure(width=665, height=660)
 
+cv.board_members = {}
 #cv.create_image(25, 25, image=photo, anchor='nw')
 
 def resize_image(event):
@@ -163,11 +164,32 @@ def updateNames(list_of_members, list_tag):
                 title = ""
 
             styret_rowspacing = namelist_rowspacing*2
-            cv.create_text(namelist_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
+            styret_offsetX = 170
+
+            if not name in cv.board_members:
+                try:
+                    #try to open file in resources
+                    in_file = open(paths.gui_bg, "rb")
+                    data_bytes = in_file.read()
+                    in_file.close()
+                    photo = ImageTk.PhotoImage(image)
+                except:
+                    try:
+                    # try to open and move the file to resources
+                    # resize it etc.
+                    except:
+                        # load default picture from resources
+            
+
+
+
+            cv.board_members[name] = board_member_image
+
+            cv.create_text(styret_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
                            namelist_offsetY + (item_nbr % items_per_row) * styret_rowspacing,
                             fill=namelist_color, font=namelist_font, anchor='nw', 
                             text=name, tag=list_tag)
-            cv.create_text(namelist_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
+            cv.create_text(styret_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
                            title_offsetY + (item_nbr % items_per_row) * styret_rowspacing,
                             fill=namelist_color, font=namelist_font, anchor='nw', 
                             text=title, tag=list_tag)
