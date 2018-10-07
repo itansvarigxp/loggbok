@@ -20,11 +20,13 @@ else:
     log_online_path = '/home/eXPerimentverkstaden/info/'
     mnt_loggbook_path = '/mnt/Digital Loggbok/'
 
+
 # Absolut mapp
 #webpage_resources_path = '/mnt/www/incheckade/'
 webpage_resources_path = '/home/eXPerimentverkstaden/incheckade/'
 styret_register_path = mnt_loggbook_path + "styret/"
 
+board_members_extern_path = styret_register_path + 'bilder/'
 # filnamn
 file_name_bg = 'bg.gif'
 file_name_logg_online = 'Loggbok_extern.xlsx'
@@ -33,6 +35,7 @@ file_name_new_member_register = 'Nyamedlemmar.xlsx'
 file_name_board_member_register = "Styrelseposter.xlsx"
 # hela sökvägen
 gui_bg = res_path + file_name_bg
+board_members_local_path = res_path + "boardmembers/"
 xlsx_logg_online = log_online_path + file_name_logg_online
 xlsx_member_register = mnt_loggbook_path + file_name_member_register
 xlsx_new_members = mnt_loggbook_path + file_name_new_member_register
@@ -41,3 +44,7 @@ xlsx_statistics = mnt_loggbook_path + 'statistik/'
 
 if not os.path.exists(styret_register_path):
     os.makedirs(styret_register_path)
+if not os.path.exists(board_members_local_path):
+    os.makedirs(board_members_local_path)
+if not os.path.exists(board_members_extern_path):
+    os.makedirs(board_members_extern_path)

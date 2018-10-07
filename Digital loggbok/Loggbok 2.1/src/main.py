@@ -63,6 +63,7 @@ def timedFunctions():
         XlsxHandler.initMemberRegister()
         GUI.updateNames(Member.checked_in_members, 'member')
         GUI.updateNames(Member.checked_in_styret, 'styret')
+        GUI.hideMessage()
         
 # Kommandon som kan skrivas i programmet för att kalla på motsvarande funktion
 commands = {
@@ -86,8 +87,7 @@ while True:
     # Gör om klassvariablerna i Members till en lista av strings med namm
     # samt uppdaterar GUI-modulen som hanterar de olika listorna.
 
-    GUI.updateNames(Member.checked_in_members, 'member')
-    GUI.updateNames(Member.checked_in_styret, 'styret')
+
     
     # Flagga för att förhindra för många functioncalls i whileloopen nedan.
     flag = True
@@ -121,6 +121,11 @@ while True:
         if member != None:
             # Om checkOut returnerar ett namn
             GUI.message('Goodbye %s' %member.getName(), 2)
+            if member.getBoardmember():
+                GUI.updateNames(Member.checked_in_styret, 'styret')
+            else:
+                GUI.updateNames(Member.checked_in_members, 'member')
+            
             # Spara den aktuella loggboken i excel
             StatLogger.checkOutStat(member)
             XlsxHandler.saveToLog(member)

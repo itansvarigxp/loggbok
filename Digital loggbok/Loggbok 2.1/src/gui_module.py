@@ -1,9 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageOps
 from datetime import datetime, timedelta
 from member import Member
 from excel_handler import styret_titles
+from os import listdir
+from os.path import isfile, join, basename, splitext
 import paths
 
 # Variabler för namn, font, storlek och så vidare i vyn
@@ -42,7 +44,7 @@ message_area_width = 600
 
 input_area_height = 15
 
-namelist_colspacing = 300
+namelist_colspacing = 250
 namelist_rowspacing = 20
 
 styret_namelist_offsetX = namelist_col_padding
@@ -144,16 +146,102 @@ def showMessage():
 
 # Uppdaterar de två olika områden där namn skrivs ut, antingen 
 # de med styret eller de med medlemmar
+source_tmp = Image.open(paths.board_members_local_path + "default.png")
+image_size_ratio = 2/3
+
+minimum_imageY = 100
+maximum_imageY = 300
+default_imageY = maximum_imageY
+minimum_image_size = (int(image_size_ratio*minimum_imageY), minimum_imageY)
+maximum_image_size = (int(image_size_ratio*maximum_imageY), maximum_imageY)
+styret_image_padY = 10
+styret_text_padX = 10
+image_size = (int(image_size_ratio*default_imageY), default_imageY)
+image = ImageOps.fit(source_tmp, image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
+cv.default_boardmember = ImageTk.PhotoImage(image)
+cv.boardmember_img_src = {}
+cv.boardmember_img_fit = {}
+cv.default_boardmember_img_src = {}
+cv.default_boardmember_img_fit = {}
+
+def loadDefaultImagesSource():
+    onlyfiles = [f for f in listdir(paths.board_members_local_path) if isfile(join(paths.board_members_local_path, f))]
+    i = 0
+    for file in onlyfiles:
+        if file[:7] == "default":
+            try:
+                in_file = Image.open(paths.board_members_local_path + file)
+                tmp = ImageOps.fit(in_file, maximum_image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
+                #tmp.save(paths.board_members_local_path + "default" + str(i) + file[-4:])
+                cv.default_boardmember_img_src[i] = tmp
+                i += 1
+            except:
+                pass
+
+loadDefaultImagesSource()
+
+def getBoardmembersImagesExtern():
+    tst =  [f for f in listdir(paths.board_members_extern_path)]
+    print(tst)
+    onlyfiles = [f for f in listdir(paths.board_members_extern_path) if isfile(join(paths.board_members_extern_path, f))]
+    for file in onlyfiles:
+        try:
+            in_file = Image.open(paths.board_members_extern_path + file)
+            tmp = ImageOps.fit(in_file, maximum_image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
+            tmp.save(paths.board_members_local_path + file)
+        except:
+            pass
+
+getBoardmembersImagesExtern()
+
+def loadBoardmembersImagesSource():
+    onlyfiles = [f for f in listdir(paths.board_members_local_path) if isfile(join(paths.board_members_local_path, f))]
+    for file in onlyfiles:
+        try:
+            in_file = Image.open(paths.board_members_local_path + file)
+            tmp = ImageOps.fit(in_file, maximum_image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
+            if file[:7] != "default":
+                cv.boardmember_img_src[basename(splitext(file)[0])] = ImageTk.PhotoImage(tmp)
+        except:
+            pass
+        
+
+loadBoardmembersImagesSource()
+
+size_table = {}
+
+def updateImageSize(items_to_be_placed):
+    global image_size
+    current_image_size = image_size
+    area_width = int(root.winfo_width())
+    area_height = member_namelist_offsetY - styret_namelist_offsetY
+    key = (area_width, area_height, items_to_be_placed)
+    items_per_col = area_height // (image_size[1] + 2*styret_image_padY)
+    items_per_row = (area_width // (namelist_colspacing + image_size[0] ))
+    maximum_nbr_items = items_per_col * items_per_row
+    if not key in size_table:
+        if items_to_be_placed > maximum_nbr_items:
+            newY_rows = area_height / (items_per_col + 1 ) - 2*styret_image_padY
+            newY_cols = (area_width / (items_per_row + 1 ) - namelist_colspacing) / image_size_ratio
+            newY = max(max(newY_rows, newY_cols), minimum_imageY)
+            size_table[key] = (int(image_size_ratio*newY), int(newY))
+            image_size = size_table[key]
+        else:
+            size_table[key] = image_size
+    else:
+        image_size = size_table[key]
+
 
 def updateNames(list_of_members, list_tag):
     cv.delete(list_tag)
     item_nbr = 0
-
+    global image_size
     if list_tag == 'styret':
+
+        updateImageSize(len(list_of_members))
         namelist_offsetX = styret_namelist_offsetX
         namelist_offsetY = styret_namelist_offsetY
-        title_offsetY = namelist_offsetY + 20
-        items_per_row = (member_namelist_offsetY - styret_namelist_offsetY - 2*namelist_rowspacing) // namelist_rowspacing
+        i = 0
 
         for member in list_of_members:
             board_member = list_of_members[member]
@@ -162,37 +250,24 @@ def updateNames(list_of_members, list_tag):
                 title = styret_titles[name]
             else:
                 title = ""
+            if name in cv.boardmember_img_src:
+                picture = ImageTk.PhotoImage(ImageOps.fit(cv.boardmember_img_src[name], image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5)))
+                cv.boardmember_img_fit[i] = picture
+                i += 1
+            else:
+                picture = ImageTk.PhotoImage(ImageOps.fit(cv.default_boardmember_img_src[0], image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5)))
+                cv.boardmember_img_fit[i] = picture
+                i += 1
 
-            styret_rowspacing = namelist_rowspacing*2
-            styret_offsetX = 170
-
-            if not name in cv.board_members:
-                try:
-                    #try to open file in resources
-                    in_file = open(paths.gui_bg, "rb")
-                    data_bytes = in_file.read()
-                    in_file.close()
-                    photo = ImageTk.PhotoImage(image)
-                except:
-                    try:
-                    # try to open and move the file to resources
-                    # resize it etc.
-                    except:
-                        # load default picture from resources
+            items_per_row = (member_namelist_offsetY - styret_namelist_offsetY) // (image_size[1] + 2*styret_image_padY)
             
-
-
-
-            cv.board_members[name] = board_member_image
-
-            cv.create_text(styret_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
-                           namelist_offsetY + (item_nbr % items_per_row) * styret_rowspacing,
-                            fill=namelist_color, font=namelist_font, anchor='nw', 
-                            text=name, tag=list_tag)
-            cv.create_text(styret_offsetX + (item_nbr // items_per_row) * namelist_colspacing,
-                           title_offsetY + (item_nbr % items_per_row) * styret_rowspacing,
-                            fill=namelist_color, font=namelist_font, anchor='nw', 
-                            text=title, tag=list_tag)
+            cv.create_image((item_nbr // items_per_row) * (namelist_colspacing + image_size[0]), 
+                            namelist_offsetY + (item_nbr % items_per_row) * (image_size[1] + styret_image_padY), 
+                            image=picture, anchor='nw', tag=list_tag)
+            cv.create_text(styret_text_padX + image_size[0] + (item_nbr // items_per_row ) * (namelist_colspacing + image_size[0]),
+                           namelist_offsetY + ((item_nbr % items_per_row)) * image_size[1] + image_size[1]/2,
+                           fill=namelist_color, font=namelist_font, anchor='w', 
+                           text=name.replace(' ', '\n') + "\n"+title, tag=list_tag)
             item_nbr += 1
     else:
         namelist_offsetX = member_namelist_offsetX
