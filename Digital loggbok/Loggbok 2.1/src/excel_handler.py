@@ -128,9 +128,6 @@ def save():
         loggbok.save(paths.xlsx_logg_online)
         global latest_save
         latest_save = datetime.now()
-        # ERROR ERROR ERROR FIX THIS
-        #current_month = datetime.now().strftime('%Y%B')
-        #loggbok.save('%s%s.xlsx' %(paths.xlsx_datalogger, current_month))
         
 
 # Parser för att kodläsaren i verkstaden läser 24 bitar medan den på kontoret
@@ -164,9 +161,13 @@ def importNewMembers():
     medSheet['A1'] = 'Nyckelnr'
     medSheet['B1'] = 'Namn'
     medSheet['C1'] = 'Anmärkning'
-    medreg.save(paths.xlsx_new_members)
-    medreg.close()
+    try:
+        medreg.save(paths.xlsx_new_members)
+        medreg.close()
+    except:
+        print("Unable to save a blank memberlist to " + paths.xlsx_new_members)
     saveMemberlistToFile()
+
 
 # Spara den aktiva medlemslistan till fil
 def saveMemberlistToFile():
@@ -188,8 +189,12 @@ def saveMemberlistToFile():
             medSheet['C' + str(row)] = None
         medSheet['D' + str(row)] = members.getLatestActivity()
         row += 1
-    medreg.save(paths.xlsx_member_register)
-    medreg.close()
+    try:
+        medreg.save(paths.xlsx_member_register)
+        medreg.close()
+    except:
+        print("Unable to save memberlist to " + paths.xlsx_member_register)
+        print("maybe due to mountin error...")
 
 # Sparar alla incheckade som glömde checka ut
 def saveAllCheckedinToLog():
