@@ -6,6 +6,7 @@ from member import Member
 from excel_handler import styret_titles
 from os import listdir
 from os.path import isfile, join, basename, splitext
+import random
 import paths
 
 # Variabler för namn, font, storlek och så vidare i vyn
@@ -146,7 +147,7 @@ def showMessage():
 
 # Uppdaterar de två olika områden där namn skrivs ut, antingen 
 # de med styret eller de med medlemmar
-source_tmp = Image.open(paths.board_members_local_path + "default.png")
+#source_tmp = Image.open(paths.board_members_local_path + "default.png")
 image_size_ratio = 2/3
 
 minimum_imageY = 100
@@ -157,8 +158,8 @@ maximum_image_size = (int(image_size_ratio*maximum_imageY), maximum_imageY)
 styret_image_padY = 10
 styret_text_padX = 10
 image_size = (int(image_size_ratio*default_imageY), default_imageY)
-image = ImageOps.fit(source_tmp, image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
-cv.default_boardmember = ImageTk.PhotoImage(image)
+#image = ImageOps.fit(source_tmp, image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
+#cv.default_boardmember = ImageTk.PhotoImage(image)
 cv.boardmember_img_src = {}
 cv.boardmember_img_fit = {}
 cv.default_boardmember_img_src = {}
@@ -166,13 +167,12 @@ cv.default_boardmember_img_fit = {}
 
 def loadDefaultImagesSource():
     onlyfiles = [f for f in listdir(paths.board_members_local_path) if isfile(join(paths.board_members_local_path, f))]
-    i = 0
+    i = 1
     for file in onlyfiles:
         if file[:7] == "default":
             try:
                 in_file = Image.open(paths.board_members_local_path + file)
                 tmp = ImageOps.fit(in_file, maximum_image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
-                #tmp.save(paths.board_members_local_path + "default" + str(i) + file[-4:])
                 cv.default_boardmember_img_src[i] = tmp
                 i += 1
             except:
@@ -181,8 +181,6 @@ def loadDefaultImagesSource():
 loadDefaultImagesSource()
 
 def getBoardmembersImagesExtern():
-    tst =  [f for f in listdir(paths.board_members_extern_path)]
-    print(tst)
     onlyfiles = [f for f in listdir(paths.board_members_extern_path) if isfile(join(paths.board_members_extern_path, f))]
     for file in onlyfiles:
         try:
@@ -201,7 +199,7 @@ def loadBoardmembersImagesSource():
             in_file = Image.open(paths.board_members_local_path + file)
             tmp = ImageOps.fit(in_file, maximum_image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
             if file[:7] != "default":
-                cv.boardmember_img_src[basename(splitext(file)[0])] = ImageTk.PhotoImage(tmp)
+                cv.boardmember_img_src[basename(splitext(file)[0])] = tmp
         except:
             pass
         
@@ -255,7 +253,8 @@ def updateNames(list_of_members, list_tag):
                 cv.boardmember_img_fit[i] = picture
                 i += 1
             else:
-                picture = ImageTk.PhotoImage(ImageOps.fit(cv.default_boardmember_img_src[0], image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5)))
+                idx = random.randint(1,len(cv.default_boardmember_img_src))
+                picture = ImageTk.PhotoImage(ImageOps.fit(cv.default_boardmember_img_src[idx], image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5)))
                 cv.boardmember_img_fit[i] = picture
                 i += 1
 
