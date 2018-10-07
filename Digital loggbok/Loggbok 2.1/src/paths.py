@@ -1,4 +1,5 @@
 import os
+import shutil
 _debug = True
 # Allt som rör namn på filstrukturer är samlat här
 
@@ -42,9 +43,16 @@ xlsx_new_members = mnt_loggbook_path + file_name_new_member_register
 xlsx_styret_register = styret_register_path + file_name_board_member_register
 xlsx_statistics = mnt_loggbook_path + 'statistik/'
 
+try:
+    shutil.rmtree(board_members_local_path)
+except:
+    pass
+
 if not os.path.exists(styret_register_path):
     os.makedirs(styret_register_path)
 if not os.path.exists(board_members_local_path):
     os.makedirs(board_members_local_path)
 if not os.path.exists(board_members_extern_path):
     os.makedirs(board_members_extern_path)
+
+

@@ -165,17 +165,22 @@ cv.default_boardmember_img_fit = {}
 def loadDefaultImagesSource():
     onlyfiles = [f for f in listdir(paths.board_members_local_path) if isfile(join(paths.board_members_local_path, f))]
     i = 1
-    for file in onlyfiles:
-        if file[:7] == "default":
-            try:
-                in_file = Image.open(paths.board_members_local_path + file)
-                tmp = ImageOps.fit(in_file, maximum_image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
-                cv.default_boardmember_img_src[i] = tmp
-                i += 1
-            except:
-                pass
+    if len(onlyfiles) == 0:
+        in_file = Image.open(paths.res_path + "default.jpg")
+        tmp = ImageOps.fit(in_file, maximum_image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
+        cv.default_boardmember_img_src[i] = tmp
+    else:
+        for file in onlyfiles:
+            if file[:7] == "default":
+                try:
+                    in_file = Image.open(paths.board_members_local_path + file)
+                    tmp = ImageOps.fit(in_file, maximum_image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
+                    cv.default_boardmember_img_src[i] = tmp
+                    i += 1
+                except:
+                    pass
 
-loadDefaultImagesSource()
+
 
 def getBoardmembersImagesExtern():
     onlyfiles = [f for f in listdir(paths.board_members_extern_path) if isfile(join(paths.board_members_extern_path, f))]
@@ -187,7 +192,6 @@ def getBoardmembersImagesExtern():
         except:
             pass
 
-getBoardmembersImagesExtern()
 
 def loadBoardmembersImagesSource():
     onlyfiles = [f for f in listdir(paths.board_members_local_path) if isfile(join(paths.board_members_local_path, f))]
@@ -199,10 +203,10 @@ def loadBoardmembersImagesSource():
                 cv.boardmember_img_src[basename(splitext(file)[0])] = tmp
         except:
             pass
-        
 
+getBoardmembersImagesExtern()
+loadDefaultImagesSource()
 loadBoardmembersImagesSource()
-
 size_table = {}
 
 def updateImageSize(items_to_be_placed):
