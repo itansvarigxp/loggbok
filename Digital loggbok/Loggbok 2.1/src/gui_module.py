@@ -76,7 +76,6 @@ else:
 	cv.configure(width=665, height=660)
 
 cv.board_members = {}
-#cv.create_image(25, 25, image=photo, anchor='nw')
 
 def resize_image(event):
     new_size = min(event.width, event.height)
@@ -96,8 +95,6 @@ def resize_image(event):
     cv.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
 
 def replace_areas(event):
-    #print(root.winfo_width())
-    #print(root.winfo_height())
     cv.configure(width=root.winfo_width(), height=root.winfo_height()-interactive_area_height)
 
 image = Image.open(paths.gui_bg)
