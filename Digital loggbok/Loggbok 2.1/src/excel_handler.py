@@ -135,9 +135,9 @@ def save():
 # parsas denna data korrekt
 def cardreaderParser(cardkey_str):
     cardreader_bits = 24
-    cardkey_binary = bin(int(cardkey_str))[2:]
-    cardkey_binary_appended = '0'*cardreader_bits + cardkey_binary
-    return ('0,%i' %int(cardkey_binary_appended[-cardreader_bits:], 2))
+    binary_str = format(int(cardkey_str), '0' + str(cardreader_bits) + 'b')[-cardreader_bits:]
+    integer_str = format(int(binary_str, 2), '#08')
+    return ('0,' + integer_str)
 
 # Importerar nya medlemmar från separat register. Om filen inte finns
 # så skapas den. När medlemmarna skrivits in i medlemsdatabasen så
