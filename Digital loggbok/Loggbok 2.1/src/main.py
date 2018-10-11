@@ -13,6 +13,9 @@ message_update_time_long = 5
 time_to_wait = 5
 latest_message_time = datetime.now()
 
+def setStateVariables(time_str):
+    global latest_message_time
+    latest_message_time = datetime.strf(time_str)
 
 def exitProgram():
     sys.exit()
@@ -61,6 +64,7 @@ def timedFunctions():
         Member.clearCheckedIn()
         XlsxHandler.initBoardMemberRegister()
         XlsxHandler.initMemberRegister()
+        GUI.initPictures()
         GUI.updateNames(Member.checked_in_members, 'member')
         GUI.updateNames(Member.checked_in_styret, 'styret')
         GUI.hideMessage()

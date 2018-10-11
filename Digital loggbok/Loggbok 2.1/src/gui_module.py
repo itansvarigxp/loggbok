@@ -204,9 +204,15 @@ def loadBoardmembersImagesSource():
         except:
             pass
 
-getBoardmembersImagesExtern()
-loadDefaultImagesSource()
-loadBoardmembersImagesSource()
+
+def initPictures():
+    paths.removeLocalPictures()
+    getBoardmembersImagesExtern()
+    loadDefaultImagesSource()
+    loadBoardmembersImagesSource()
+
+
+initPictures()
 size_table = {}
 
 def updateImageSize(items_to_be_placed):
