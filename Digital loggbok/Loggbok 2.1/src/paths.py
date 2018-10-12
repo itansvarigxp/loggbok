@@ -51,9 +51,6 @@ def removeLocalPictures():
     if not os.path.exists(board_members_local_path):
         os.makedirs(board_members_local_path)
 
-
-removeLocalPictures()
-
 if not os.path.exists(styret_register_path):
     os.makedirs(styret_register_path)
 if not os.path.exists(board_members_extern_path):
