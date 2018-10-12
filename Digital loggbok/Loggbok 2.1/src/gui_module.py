@@ -6,8 +6,11 @@ from member import Member
 from excel_handler import styret_titles
 from os import listdir
 from os.path import isfile, join, basename, splitext
+from functools import reduce
 import random
 import paths
+import operator
+
 
 # Variabler för namn, font, storlek och så vidare i vyn
 styret_namelist = ""
@@ -165,7 +168,10 @@ cv.default_boardmember_img_fit = {}
 def loadDefaultImagesSource():
     onlyfiles = [f for f in listdir(paths.board_members_local_path) if isfile(join(paths.board_members_local_path, f))]
     i = 1
-    if len(onlyfiles) == 0:
+    func = lambda a: "default" in a
+    default_file_exist = reduce(operator.or_, (map(func, onlyfiles)), False)
+    print(default_file_exist)
+    if not default_file_exist:
         in_file = Image.open(paths.res_path + "default.jpg")
         tmp = ImageOps.fit(in_file, maximum_image_size, method=Image.ANTIALIAS, bleed=0.0, centering=(0.5, 0.5))
         cv.default_boardmember_img_src[i] = tmp
