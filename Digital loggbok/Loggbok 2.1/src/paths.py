@@ -1,6 +1,6 @@
 import os
 import shutil
-_debug = True
+_debug = False
 # Allt som rör namn på filstrukturer är samlat här
 
 # huvudmapp
