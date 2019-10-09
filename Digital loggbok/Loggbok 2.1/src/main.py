@@ -74,7 +74,7 @@ def timedFunctions():
             GUI.updateNames(Member.checked_in_styret, 'styret')
         except:
             try:
-                os.command(mnt)
+                os.system(mnt)
             except:
                 pass
         
