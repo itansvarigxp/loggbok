@@ -22,6 +22,7 @@ pw = pyautogui.password(text='Enter password for mounting Z-drive', title='', de
 
 # Fras för att montera Z-disken
 mnt = f'sudo mount.cifs //sol.ita.chalmers.se/expe /mnt -o user={cid}, password={pw},vers=3.0'
+os.system(mnt)
 
 def exitProgram():
     sys.exit()
