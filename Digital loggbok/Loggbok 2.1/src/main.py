@@ -21,7 +21,7 @@ cid = pyautogui.prompt(text='Enter CID for mounting Z-drive', title='' , default
 pw = pyautogui.password(text='Enter password for mounting Z-drive', title='', default='', mask='*')
 
 # Fras för att montera Z-disken
-mnt = f'sudo mount.cifs //sol.ita.chalmers.se/expe /mnt -o user={cid}, password={pw},vers=3.0'
+mnt = f'sudo mount.cifs //sol.ita.chalmers.se/expe /mnt -o user={cid},password={pw},vers=3.0'
 os.system(mnt)
 
 def exitProgram():
