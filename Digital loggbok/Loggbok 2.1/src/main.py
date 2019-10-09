@@ -7,11 +7,22 @@ import gui_module as GUI
 from datetime import datetime, timedelta
 import sys
 import os
+import pyautogui	
 
 message_update_time_short = 2
 message_update_time_long = 5
 time_to_wait = 5
 latest_message_time = datetime.now()
+
+# Frågar efter CID för mount av Z-disk
+cid = pyautogui.prompt(text='Enter CID for mounting Z-drive', title='' , default='')
+
+# Frågar efter lösen för mount av Z-disk
+pw = pyautogui.password(text='Enter password for mounting Z-drive', title='', default='', mask='*')
+
+# Fras för att montera Z-disken
+mnt = f'sudo mount.cifs //sol.ita.chalmers.se/expe /mnt -o user={cid}, password={pw},vers=3.0'
+
 
 def setStateVariables(time_str):
     global latest_message_time
