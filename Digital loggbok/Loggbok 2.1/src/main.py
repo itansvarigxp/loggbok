@@ -7,12 +7,21 @@ import gui_module as GUI
 from datetime import datetime, timedelta
 import sys
 import os
+import pyautogui	
 
 message_update_time_short = 2
 message_update_time_long = 5
 time_to_wait = 5
 latest_message_time = datetime.now()
 
+# Frågar efter CID för mount av Z-disk
+cid = pyautogui.prompt(text='Enter CID for mounting Z-drive', title='' , default='')
+
+# Frågar efter lösen för mount av Z-disk
+pw = pyautogui.password(text='Enter password for mounting Z-drive', title='', default='', mask='*')
+
+# Fras för att montera Z-disken
+mnt = f'sudo mount.cifs //sol.ita.chalmers.se/expe /mnt -o user={cid}, password={pw},vers=3.0'
 
 def exitProgram():
     sys.exit()
@@ -53,15 +62,21 @@ def timedFunctions():
         GUI.message(message_string)
         # Dagens statistik loggas. Måste göras innan de som glömt att checka ut
         # rensas ur loggboken
-        XlsxHandler.saveStatistics()
-        StatLogger.resetCheckins()
-        XlsxHandler.cleanEarliestLoggbook()
-        XlsxHandler.importNewMembers()
-        XlsxHandler.saveAllCheckedinToLog()
-        Member.clearCheckedIn()
-        XlsxHandler.initMemberRegister()
-        GUI.updateNames(Member.checked_in_members, 'member')
-        GUI.updateNames(Member.checked_in_styret, 'styret')
+        try:
+            XlsxHandler.saveStatistics()
+            StatLogger.resetCheckins()
+            XlsxHandler.cleanEarliestLoggbook()
+            XlsxHandler.importNewMembers()
+            XlsxHandler.saveAllCheckedinToLog()
+            Member.clearCheckedIn()
+            XlsxHandler.initMemberRegister()
+            GUI.updateNames(Member.checked_in_members, 'member')
+            GUI.updateNames(Member.checked_in_styret, 'styret')
+        except:
+            try:
+                os.command(mnt)
+            except:
+                pass
         
 # Kommandon som kan skrivas i programmet för att kalla på motsvarande funktion
 commands = {
