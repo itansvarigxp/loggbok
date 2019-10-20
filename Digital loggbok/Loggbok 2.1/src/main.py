@@ -21,7 +21,7 @@ latest_message_time = datetime.now()
 #pw = pyautogui.password(text='Enter password for mounting Z-drive', title='', default='', mask='*') ***************
 
 # Fras för att montera Z-disken
-mnt = f'sudo mount.cifs //sol.ita.chalmers.se/expe /mnt -o user={GUI.cid}, password={GUI.pw},vers=3.0'
+mnt = '+sudo mount.cifs //sol.ita.chalmers.se/expe /mnt -o user={GUI.cid}, password={GUI.pw},vers=3.0+'
 
 
 def setStateVariables(time_str):
